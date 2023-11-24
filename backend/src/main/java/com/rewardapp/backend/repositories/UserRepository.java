@@ -2,7 +2,6 @@ package com.rewardapp.backend.repositories;
 
 import com.rewardapp.backend.exceptions.AuthException;
 import com.rewardapp.backend.models.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -19,13 +18,17 @@ public class UserRepository {
             "INSERT INTO users (username, password, email) " +
             "VALUES (?, ?, ?);";
 
-    private static final String SQL_GET_BY_ID = "SELECT * FROM users " +
+    private static final String SQL_GET_BY_ID =
+            "SELECT * FROM users " +
             "WHERE id = ?";
 
-    @Autowired
-    private JdbcTemplate jdbc;
+    private final JdbcTemplate jdbc;
+    public UserRepository(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
 
-    public Integer create(String username, String email, String password) throws AuthException {
+
+    public Integer register(String username, String email, String password) throws AuthException {
         KeyHolder holder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
@@ -37,11 +40,11 @@ public class UserRepository {
         return (Integer) holder.getKeys().get("id");
     }
 
-    public User findById(Integer id) {
-        return jdbc.queryForObject(SQL_GET_BY_ID, this::mapRowToUser, id);
+    public User find_by_id(Integer id) {
+        return jdbc.queryForObject(SQL_GET_BY_ID, this::map_row_to_user, id);
     }
 
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+    private User map_row_to_user(ResultSet resultSet, int rowNum) throws SQLException {
         User user = new User();
         user.setId(resultSet.getInt("id"));
         user.setUsername(resultSet.getString("username"));
