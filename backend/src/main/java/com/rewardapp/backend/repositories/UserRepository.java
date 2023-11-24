@@ -1,7 +1,8 @@
 package com.rewardapp.backend.repositories;
 
-import com.rewardapp.backend.exceptions.AuthException;
 import com.rewardapp.backend.models.User;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -28,16 +29,20 @@ public class UserRepository {
     }
 
 
-    public Integer register(String username, String email, String password) throws AuthException {
+    public User register(User user){
         KeyHolder holder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, username);
-            ps.setString(2, email);
-            ps.setString(3, password);
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
             return ps;
         }, holder);
-        return (Integer) holder.getKeys().get("id");
+
+        Integer id = (Integer) holder.getKeys().get("id");
+        user.setId(id);
+
+        return user;
     }
 
     public User find_by_id(Integer id) {
