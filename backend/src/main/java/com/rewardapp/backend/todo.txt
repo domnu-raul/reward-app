@@ -1,0 +1,3 @@
+implement a proper DAO with JDBC: https://www.youtube.com/watch?v=0uLqdBpYAVA
+make proper exceptions that will get returned by the api
+make the service layer properly validate user data and encrypt passwords.

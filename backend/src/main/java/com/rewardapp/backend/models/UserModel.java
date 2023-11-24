@@ -4,7 +4,7 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
 
-public class User extends RepresentationModel<User> {
+public class UserModel extends RepresentationModel<UserModel> {
     private Integer id;
     private String username;
     private String password;
@@ -46,7 +46,7 @@ public class User extends RepresentationModel<User> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
+        UserModel user = (UserModel) o;
         return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email);
     }
 

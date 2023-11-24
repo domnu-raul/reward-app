@@ -1,8 +1,6 @@
 package com.rewardapp.backend.repositories;
 
-import com.rewardapp.backend.models.User;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.hateoas.EntityModel;
+import com.rewardapp.backend.models.UserModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -23,13 +21,16 @@ public class UserRepository {
             "SELECT * FROM users " +
             "WHERE id = ?";
 
+    private static final String SQL_GET_BY_USERNAME =
+            "SELECT * FROM users " +
+            "WHERE username = ?";
     private final JdbcTemplate jdbc;
     public UserRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
 
-    public User register(User user){
+    public UserModel register(UserModel user){
         KeyHolder holder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
@@ -45,12 +46,16 @@ public class UserRepository {
         return user;
     }
 
-    public User find_by_id(Integer id) {
+    public UserModel find_by_id(Integer id) {
         return jdbc.queryForObject(SQL_GET_BY_ID, this::map_row_to_user, id);
     }
 
-    private User map_row_to_user(ResultSet resultSet, int rowNum) throws SQLException {
-        User user = new User();
+    public UserModel find_by_username(String username) {
+        return jdbc.queryForObject(SQL_GET_BY_USERNAME, this::map_row_to_user, username);
+    }
+
+    private UserModel map_row_to_user(ResultSet resultSet, int rowNum) throws SQLException {
+        UserModel user = new UserModel();
         user.setId(resultSet.getInt("id"));
         user.setUsername(resultSet.getString("username"));
         user.setPassword(resultSet.getString("password"));

@@ -1,8 +1,7 @@
 package com.rewardapp.backend.services;
 
-import com.rewardapp.backend.models.User;
+import com.rewardapp.backend.models.UserModel;
 import com.rewardapp.backend.repositories.UserRepository;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +14,15 @@ public class UserService {
         this.repository = repository;
     }
 
-    public User validate(String email, String password) {
-        return null;
-    }
-
-    public User register(User user) {
+    public UserModel register(UserModel user) {
         return this.repository.register(user);
     }
 
-    public User find_by_id(Integer id) {
+    public UserModel find_by_id(Integer id) {
         return this.repository.find_by_id(id);
+    }
+
+    public UserModel find_by_username(String username) {
+        return this.repository.find_by_username(username);
     }
 }

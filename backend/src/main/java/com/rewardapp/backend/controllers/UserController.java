@@ -1,14 +1,12 @@
 package com.rewardapp.backend.controllers;
 
-import com.rewardapp.backend.models.User;
+import com.rewardapp.backend.models.UserModel;
 import com.rewardapp.backend.services.UserService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -22,9 +20,9 @@ public class UserController {
         this.service = service;
     }
 
-    @PostMapping
-    public ResponseEntity<EntityModel<User>> register(@RequestBody User user) {
-        EntityModel<User> response = EntityModel.of(service.register(user));
+    @PostMapping("/register")
+    public ResponseEntity<EntityModel<UserModel>> register(@RequestBody UserModel user) {
+        EntityModel<UserModel> response = EntityModel.of(service.register(user));
 
         Link link = linkTo(methodOn(UserController.class).find_by_id(user.getId())).withSelfRel();
         response.add(link);
@@ -34,10 +32,22 @@ public class UserController {
                 .body(response);
     }
 
-    @GetMapping("/{id}")
-    public EntityModel<User> find_by_id(@PathVariable("id") Integer id) {
-        User user = service.find_by_id(id);
+    @GetMapping("/id/{id}")
+    public ResponseEntity<EntityModel<UserModel>> find_by_id(@PathVariable("id") Integer id) {
+        UserModel user = service.find_by_id(id);
         Link link = linkTo(methodOn(UserController.class).find_by_id(id)).withSelfRel();
-        return EntityModel.of(user, link);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(EntityModel.of(user, link));
+    }
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<EntityModel<UserModel>> find_by_username(@PathVariable("username") String username) {
+        UserModel user = service.find_by_username(username);
+        Link link = linkTo(methodOn(UserController.class).find_by_id(user.getId())).withSelfRel();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(EntityModel.of(user, link));
+
     }
 }
