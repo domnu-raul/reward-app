@@ -1,8 +1,10 @@
 package com.rewardapp.backend.models;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import java.util.Objects;
 
-public class User {
+public class User extends RepresentationModel<User> {
     private Integer id;
     private String username;
     private String password;
