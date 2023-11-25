@@ -19,11 +19,11 @@ public class UserRepository {
 
     private static final String SQL_GET_BY_ID =
             "SELECT * FROM users " +
-            "WHERE id = ?";
+            "WHERE id = ?;";
 
     private static final String SQL_GET_BY_USERNAME =
             "SELECT * FROM users " +
-            "WHERE username = ?";
+            "WHERE username = ?;";
     private final JdbcTemplate jdbc;
     public UserRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
@@ -36,7 +36,6 @@ public class UserRepository {
             PreparedStatement ps = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword());
             return ps;
         }, holder);
 
@@ -58,7 +57,6 @@ public class UserRepository {
         UserModel user = new UserModel();
         user.setId(resultSet.getInt("id"));
         user.setUsername(resultSet.getString("username"));
-        user.setPassword(resultSet.getString("password"));
         user.setEmail(resultSet.getString("email"));
         return user;
     }
