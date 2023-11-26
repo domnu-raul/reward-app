@@ -2,7 +2,7 @@ package com.rewardapp.backend.models;
 
 import java.util.Objects;
 
-public class SessionModel {
+public class Session {
     private Integer id;
     private String session_id;
     private String expiration_date;
@@ -44,7 +44,7 @@ public class SessionModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SessionModel that = (SessionModel) o;
+        Session that = (Session) o;
         return Objects.equals(id, that.id) && Objects.equals(session_id, that.session_id) && Objects.equals(expiration_date, that.expiration_date) && Objects.equals(user_id, that.user_id);
     }
 

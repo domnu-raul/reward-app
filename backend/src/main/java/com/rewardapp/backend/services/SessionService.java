@@ -1,6 +1,7 @@
 package com.rewardapp.backend.services;
 
-import com.rewardapp.backend.models.SessionModel;
+import com.rewardapp.backend.models.Session;
+import com.rewardapp.backend.models.User;
 import com.rewardapp.backend.repositories.SessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,13 @@ public class SessionService {
         this.repository = repository;
     }
 
-    public SessionModel find_by_id(Integer id) {
-        return this.repository.find_by_id(id);
+    public Session find_by_id(Integer id) {
+        //todo
+        //return this.repository.find_by_id(id);
+        return null;
+    }
+
+    public Session create(User user) {
+        return repository.create(user);
     }
 }

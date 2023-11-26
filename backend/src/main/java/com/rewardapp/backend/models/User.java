@@ -1,10 +1,8 @@
 package com.rewardapp.backend.models;
 
-import org.springframework.hateoas.RepresentationModel;
-
 import java.util.Objects;
 
-public class UserModel {
+public class User {
     protected Integer id;
     protected String username;
     protected String email;
@@ -64,8 +62,8 @@ public class UserModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserModel userModel = (UserModel) o;
-        return Objects.equals(id, userModel.id) && Objects.equals(username, userModel.username) && Objects.equals(email, userModel.email) && Objects.equals(verified, userModel.verified) && Objects.equals(register_date, userModel.register_date) && Objects.equals(type, userModel.type);
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(email, user.email) && Objects.equals(verified, user.verified) && Objects.equals(register_date, user.register_date) && Objects.equals(type, user.type);
     }
 
     @Override

@@ -1,3 +1,144 @@
-implement a proper DAO with JDBC: https://www.youtube.com/watch?v=0uLqdBpYAVA
+// implement a proper DAO with JDBC: https://www.youtube.com/watch?v=0uLqdBpYAVA
 make proper exceptions that will get returned by the api
-make the service layer properly validate user data and encrypt passwords.
+// make the service layer properly validate user data and encrypt passwords.
+
+EXCEPTIONS:
+    IncorrectPasswordException
+    UserNotFoundException
+    SessionCreationException
+
+
+FRONT-END FUNCTIONALITIES:
+    - Registration page:
+        USERNAME
+        E-MAIL
+        PASSWORD x 2
+
+        Email validation(REGEX) +
+        Email confirmation(Email sender(Backend))
+        Social Media Integration.
+
+    - Login page:
+        Simple validation.
+
+    - Home page(user):
+        "Recycling Centers" section(table view)
+            COLUMNS: Name, Location, type(s) of material, operating hours.
+            Initially sorted alphabetically.
+            Shows a relevant message if there is nothing to show.
+
+            Dropdown menu for filtering: // NO PAGE RELOAD - IN REAL TIME
+                by materials
+                multiple seelctions
+
+            Search bar at the top - shows results based on names/addresses.
+            Supports partial matches. Updates in real time(NO SEARCH BUTTON)
+
+            RESET button, resets filters, sorts, and searches.
+
+            Sort
+                by location
+                by name
+                by type accepted
+            No sort button, use the columns.
+
+
+    - User Recycling Tracking:
+        Shows contributed materials(per type).
+
+        A form for contributing to a center:
+            Material type(dropdown, searchable) only including the types
+            of materials accepeted by that center
+            Amount(in kg, piece, dkg, g) with numbers-only validation.
+            CONTRIBUTE btn, will update the user's progress in real time.
+
+    - Dashboard page(Admin):
+        Add new center:
+            county(dropdown, searchable)
+            city(dropdown, searchable)
+            materials(dropdown, searchable)
+            name(text-field)
+            working hours(2 time selectors)
+
+            Save button:
+                returns error("ALL FIELDS MANDATORY").
+                properly commits to the database and updates the list in real time.
+
+
+
+
+
+
+
+BACKEND STRUCTURE:
+    AUTH:
+        /api/auth/login - DONE
+        /api/auth/register - DONE
+        /api/auth
+    SESSION:
+    ACTIVITY:
+    RECYCLING CENTERS:
+    CONTRIBUTIONS:
+    VOUCHERS:
+    USERS:
+
+    - make a response model (status, data)
+
+
+DB STRUCTURE:
+    USERS: // exists
+        id - serial pk
+        username - varchar(80)
+        email - varchar(255)
+        verified - bool - false
+        register_date - date - current_date
+        type - user_type - 'user'
+
+        INTERNAL_USERS:
+            internal_u_id - serial pk
+            password - varchar(255);
+
+    SESSIONS: // exists
+        id - serial pk
+        session_id - varchar(255)
+        exp_date - date - now() + 3 days
+        user_id - int fk users(id)
+
+    EMAIL_TOKENS: // exists
+        id - serial pk
+        token - varchar(255) not null
+        exp_date - date - now() + 30 days
+        user_id - int fk users(id)
+
+    RECYCLING_CENTERS: // exists
+        id - serial pk
+        name - varchar(255)
+        materials - material_type[]
+        location - location_type
+        starting_time -  TIME
+        end_time - TIME
+
+    CONTRIBUTIONS:
+        user_id - int fk users(id)
+        recycling_center_id - int fk recycling_centers(id)
+        timestamp-  TIMESTAMP - now()
+        material - material
+        quantity - INT
+        measurment - measurment?
+
+
+    CUSTOM_TYPES:
+        ENUM user_type ('admin', 'user')
+        ENUM material_type
+            'PLASTIC',
+             'METAL',
+             'PAPER',
+             'GLASS',
+             'ALUMINUM_CANS',
+             'E_WASTE'
+
+        location_type
+            county VARCHAR(50),
+            city VARCHAR(50),
+            address VARCHAR(255),
+            postal_code VARCHAR(20)
