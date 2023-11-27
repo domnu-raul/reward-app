@@ -18,19 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
-    private final AuthService auth_service;
-    private final SessionService session_service;
-    private final AuthRepository auth_repository;
+    private final AuthService authService;
+    private final SessionService sessionService;
+    private final AuthRepository authRepository;
 
-    public AuthController(AuthService auth_service, SessionService session_service, AuthRepository authRepository) {
-        this.auth_service = auth_service;
-        this.session_service = session_service;
-        this.auth_repository = authRepository;
+    public AuthController(AuthService authService, SessionService sessionService, AuthRepository authRepository) {
+        this.authService = authService;
+        this.sessionService = sessionService;
+        this.authRepository = authRepository;
     }
 
     @PostMapping("/login")
     public ResponseEntity<EntityModel<Session>> login(@RequestBody InternalUser user) {
-        Session session = auth_service.login_validation(user);
+        Session session = authService.login_validation(user);
         EntityModel<Session> response = EntityModel.of(session);
 
 //        Cookie cookie = new Cookie("session_id", session.getSession_id());
@@ -43,7 +43,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@RequestBody InternalUser user) {
-        User new_user = this.auth_service.register(user);
+        User new_user = this.authService.register(user);
 
         UserResponse response = UserResponse.fromUser(new_user);
 

@@ -1,5 +1,4 @@
 package com.rewardapp.backend.models;
-
 import java.util.Objects;
 
 public class InternalUser extends User {

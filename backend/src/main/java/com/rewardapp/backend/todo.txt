@@ -74,15 +74,18 @@ BACKEND STRUCTURE:
     AUTH:
         /api/auth/login - DONE
         /api/auth/register - DONE
-        /api/auth
+        /api/auth/logout
     SESSION:
-    ACTIVITY:
-    RECYCLING CENTERS:
+        /api/{session}/...
     CONTRIBUTIONS:
+        /api/{session}/contribution
     VOUCHERS:
-    USERS:
+        /api/{session}/vouchers
+    RECYCLING CENTERS:
+        /api/recycling-centers/
 
     - make a response model (status, data)
+    - make ExceptionControllerAdvice behave properly
 
 
 DB STRUCTURE:
@@ -95,7 +98,6 @@ DB STRUCTURE:
         type - user_type - 'user'
 
         INTERNAL_USERS:
-            internal_u_id - serial pk
             password - varchar(255);
 
     SESSIONS: // exists

@@ -15,7 +15,6 @@ import java.util.Optional;
 public class SessionJdbcDAO implements DAO<Session> {
     private final JdbcTemplate jdbcTemplate;
     private static final Logger log = LoggerFactory.getLogger(SessionJdbcDAO.class);
-
     private static final RowMapper<Session> rowMapper = (rs, rowNum) -> {
         Session session = new Session();
         session.setId(rs.getInt("id"));
