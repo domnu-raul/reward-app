@@ -1,36 +1,38 @@
 package com.rewardapp.backend.controllers;
 
-import com.rewardapp.backend.models.InternalUser;
-import com.rewardapp.backend.models.Session;
-import com.rewardapp.backend.models.User;
-import com.rewardapp.backend.models.UserResponse;
-import com.rewardapp.backend.repositories.AuthRepository;
-import com.rewardapp.backend.services.AuthService;
+import com.rewardapp.backend.entities.Session;
+import com.rewardapp.backend.entities.User;
+import com.rewardapp.backend.services.EmailSenderService;
 import com.rewardapp.backend.services.SessionService;
+import com.rewardapp.backend.services.UserService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
-    private final AuthService authService;
+    private final UserService userService;
     private final SessionService sessionService;
-    private final AuthRepository authRepository;
+    private final EmailSenderService emailSenderService;
 
-    public AuthController(AuthService authService, SessionService sessionService, AuthRepository authRepository) {
-        this.authService = authService;
+    public AuthController(UserService userService, SessionService sessionService, EmailSenderService emailSenderService) {
+        this.userService = userService;
         this.sessionService = sessionService;
-        this.authRepository = authRepository;
+        this.emailSenderService = emailSenderService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<EntityModel<Session>> login(@RequestBody InternalUser user) {
-        Session session = authService.login_validation(user);
+    public ResponseEntity<EntityModel<Session>> login(@RequestBody Map<String, String> requestBody) {
+        String username = requestBody.get("username");
+        String password = requestBody.get("password");
+
+        User user = userService.validate(username, password);
+        Session session = sessionService.create(user);
+
         EntityModel<Session> response = EntityModel.of(session);
 
 //        Cookie cookie = new Cookie("session_id", session.getSession_id());
@@ -42,10 +44,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody InternalUser user) {
-        User new_user = this.authService.register(user);
+    public ResponseEntity<EntityModel<User>> register(@RequestBody Map<String, String> requestBody) {
+        String username = requestBody.get("username");
+        String email = requestBody.get("email");
+        String password = requestBody.get("password");
 
-        UserResponse response = UserResponse.fromUser(new_user);
+        User user = userService.register(username, email, password);
+        EntityModel<User> response = EntityModel.of(user);
+
+//        emailSenderService.sendEmail("sir.c4ppuccin0@gmail.com", "test", "working");
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

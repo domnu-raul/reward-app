@@ -1,6 +1,5 @@
-// implement a proper DAO with JDBC: https://www.youtube.com/watch?v=0uLqdBpYAVA
-make proper exceptions that will get returned by the api
-// make the service layer properly validate user data and encrypt passwords.
+cut the inheritance, use classic foreign keys
+learn to use JPA with user-defined types, enums, and arrays.
 
 EXCEPTIONS:
     IncorrectPasswordException
@@ -54,8 +53,7 @@ FRONT-END FUNCTIONALITIES:
 
     - Dashboard page(Admin):
         Add new center:
-            county(dropdown, searchable)
-            city(dropdown, searchable)
+            location(map, searchable, enforce proper location data and geocoding)
             materials(dropdown, searchable)
             name(text-field)
             working hours(2 time selectors)
@@ -64,28 +62,78 @@ FRONT-END FUNCTIONALITIES:
                 returns error("ALL FIELDS MANDATORY").
                 properly commits to the database and updates the list in real time.
 
-
-
-
-
-
-
 BACKEND STRUCTURE:
-    AUTH:
-        /api/auth/login - DONE
-        /api/auth/register - DONE
-        /api/auth/logout
-    SESSION:
-        /api/{session}/...
-    CONTRIBUTIONS:
-        /api/{session}/contribution
-    VOUCHERS:
-        /api/{session}/vouchers
-    RECYCLING CENTERS:
-        /api/recycling-centers/
+    project:
+    Models:
+        User
+            InternalUser
+            GoogleUser
+        Session
+        RecyclingCenter
+        Voucher
+        EmailToken
+        Address?
 
-    - make a response model (status, data)
-    - make ExceptionControllerAdvice behave properly
+        GeneralResponse(metadata + actual response)
+            UserResponse
+            SessionResponse
+            VoucherResponse
+            ReciclyingCenterResponse?
+
+    Controllers:
+        everyone
+        AuthController
+            uses the UserService to validate login data and to create new users.
+            uses the SessionService to create a new session for a user and return it.
+            uses the EmailTokenService to create a new email token, and also to validate the user with it.
+            uses the EmailSenderService to send an email to the user for validation.
+            PATHS:
+                api/auth/login POST
+                api/auth/logout POST
+                api/auth/verify POST
+                api/auth/register POST
+                api/auth/update PUT
+
+        logged in
+        RecyclingCenterController
+            PATHS:
+                users
+                api/recycling-centers/all GET
+                api/recycling-centers/{id} GET
+                admin_only
+                api/recycling-centers/(add) POST
+                api/recycling-centers/(delete) DELETE
+                api/recycling-centers/(update) PUT
+
+        VoucherController
+            uses the SessionServiImplement proper validation and potentially integrate with backend validation.
+ce and the UserService to get user specific data
+            PATHS:
+                users
+                api/vouchers/all GET
+                api/vouchers/{id} GET
+                api/vouchers/buy POST
+
+        ContributionsController
+            uses the SessionService and the UserService to get user specific data
+            PATHS:
+                users
+                api/contributions/all GET
+                api/contributions/{id} GET
+                api/contributions/(add) POST
+
+    Services:
+        Auth
+            UserService
+            SessionService
+            EmailSenderService
+            EmailTokenService
+
+        Data
+            RecyclingCenterService
+            VoucherService
+            ContributionService
+            UserDataService
 
 
 DB STRUCTURE:
@@ -129,6 +177,14 @@ DB STRUCTURE:
         measurment - measurment?
 
 
+    VOUCHERS:
+        id - serial pk
+        code - varchar(80)
+        value - int
+        cost - int
+        user_id - int fk users(id)
+
+
     CUSTOM_TYPES:
         ENUM user_type ('admin', 'user')
         ENUM material_type
@@ -144,3 +200,14 @@ DB STRUCTURE:
             city VARCHAR(50),
             address VARCHAR(255),
             postal_code VARCHAR(20)
+            coordinates geography(Point, 4326)
+
+// new recycling center query
+INSERT INTO RECYCLING_CENTERS (name, materials, location, starting_time, end_time)
+VALUES (
+    'New Recycling Center',
+    ARRAY['PLASTIC'::material_type, 'METAL'::material_type],
+     ('Cluj', 'Cluj-Napoca', 'Some Street', '123456', 'POINT(45.747470 21.217110)'::geography)::location_type,
+    '08:00:00',
+    '17:00:00'
+)

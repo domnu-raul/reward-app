@@ -1,18 +1,30 @@
-package com.rewardapp.backend.models;
+package com.rewardapp.backend.entities;
 
+import jakarta.persistence.*;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "sessions")
 public class Session {
-    private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
+    private Long id;
+    @Column(name = "session_id", unique = true, nullable = false)
     private String session_id;
-    private String expiration_date;
-    private Integer user_id;
+    @Column(name = "expiration_date", nullable = false, columnDefinition = "DATE DEFAULT now() + '3 days'::interval")
+    private Timestamp expiration_date = Timestamp.valueOf(LocalDateTime.now().plusDays(3L));
+    @Column(name = "user_id", nullable = false)
+    private Long user_id;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -24,19 +36,19 @@ public class Session {
         this.session_id = session_id;
     }
 
-    public String getExpiration_date() {
+    public Timestamp getExpiration_date() {
         return expiration_date;
     }
 
-    public void setExpiration_date(String expiration_date) {
+    public void setExpiration_date(Timestamp expiration_date) {
         this.expiration_date = expiration_date;
     }
 
-    public Integer getUser_id() {
+    public Long getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(Integer user_id) {
+    public void setUser_id(Long user_id) {
         this.user_id = user_id;
     }
 
