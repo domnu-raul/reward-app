@@ -42,7 +42,10 @@ public class RecyclingCenter {
     }
 
     public List<RecyclingCenterMaterials.MaterialType> getMaterials() {
-        return materials.stream().map(center -> center.getMaterial()).collect(Collectors.toList());
+        return materials
+                .stream()
+                .map(center -> center.getMaterial())
+                .collect(Collectors.toList());
     }
 
     public void setMaterials(List<RecyclingCenterMaterials> materials) {

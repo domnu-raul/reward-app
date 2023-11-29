@@ -1,10 +1,15 @@
-cut the inheritance, use classic foreign keys
 learn to use JPA with user-defined types, enums, and arrays.
+add loggers.
 
 EXCEPTIONS:
     IncorrectPasswordException
     UserNotFoundException
+    UserAlreadyExistsException
+    InvalidEmailException
+
     SessionCreationException
+    InvalidSessionException
+
 
 
 FRONT-END FUNCTIONALITIES:
@@ -169,6 +174,7 @@ DB STRUCTURE:
         end_time - TIME
 
     CONTRIBUTIONS:
+        id - int pk
         user_id - int fk users(id)
         recycling_center_id - int fk recycling_centers(id)
         timestamp-  TIMESTAMP - now()

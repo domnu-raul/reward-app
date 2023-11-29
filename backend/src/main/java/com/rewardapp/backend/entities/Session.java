@@ -14,11 +14,11 @@ public class Session {
     @Column(name = "id", nullable = false)
     private Long id;
     @Column(name = "session_id", unique = true, nullable = false)
-    private String session_id;
+    private String sessionId;
     @Column(name = "expiration_date", nullable = false, columnDefinition = "DATE DEFAULT now() + '3 days'::interval")
-    private Timestamp expiration_date = Timestamp.valueOf(LocalDateTime.now().plusDays(3L));
+    private Timestamp expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(0L));
     @Column(name = "user_id", nullable = false)
-    private Long user_id;
+    private Long userId;
 
     public Long getId() {
         return id;
@@ -28,28 +28,28 @@ public class Session {
         this.id = id;
     }
 
-    public String getSession_id() {
-        return session_id;
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setSession_id(String session_id) {
-        this.session_id = session_id;
+    public void setSessionId(String session_id) {
+        this.sessionId = session_id;
     }
 
-    public Timestamp getExpiration_date() {
-        return expiration_date;
+    public Timestamp getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setExpiration_date(Timestamp expiration_date) {
-        this.expiration_date = expiration_date;
+    public void setExpirationDate(Timestamp expiration_date) {
+        this.expirationDate = expiration_date;
     }
 
-    public Long getUser_id() {
-        return user_id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUserId(Long user_id) {
+        this.userId = user_id;
     }
 
     @Override
@@ -57,11 +57,11 @@ public class Session {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Session that = (Session) o;
-        return Objects.equals(id, that.id) && Objects.equals(session_id, that.session_id) && Objects.equals(expiration_date, that.expiration_date) && Objects.equals(user_id, that.user_id);
+        return Objects.equals(id, that.id) && Objects.equals(sessionId, that.sessionId) && Objects.equals(expirationDate, that.expirationDate) && Objects.equals(userId, that.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, session_id, expiration_date, user_id);
+        return Objects.hash(id, sessionId, expirationDate, userId);
     }
 }
