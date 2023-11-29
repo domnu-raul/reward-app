@@ -1,6 +1,10 @@
 learn to use JPA with user-defined types, enums, and arrays.
 add loggers.
 
+make a DataMaintenanceService, that has scheduled tasks to purge data such as expired sessions or unverified users.
+OR
+schedule the tasks in PSQL.
+
 EXCEPTIONS:
     IncorrectPasswordException
     UserNotFoundException

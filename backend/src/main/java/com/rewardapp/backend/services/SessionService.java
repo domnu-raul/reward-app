@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -24,7 +23,6 @@ public class SessionService {
 
     public Session create(User user) {
         Session session = new Session();
-        session.setSessionId(UUID.randomUUID().toString());
         session.setUserId(user.getId());
         return repository.save(session);
     }

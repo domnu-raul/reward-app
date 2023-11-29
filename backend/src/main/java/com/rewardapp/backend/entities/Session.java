@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "sessions")
@@ -14,7 +15,7 @@ public class Session {
     @Column(name = "id", nullable = false)
     private Long id;
     @Column(name = "session_id", unique = true, nullable = false)
-    private String sessionId;
+    private String sessionId = UUID.randomUUID().toString();
     @Column(name = "expiration_date", nullable = false, columnDefinition = "DATE DEFAULT now() + '3 days'::interval")
     private Timestamp expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(0L));
     @Column(name = "user_id", nullable = false)

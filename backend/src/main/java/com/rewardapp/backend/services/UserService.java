@@ -8,6 +8,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
@@ -62,5 +63,9 @@ public class UserService {
 
     public User getUserById(Long id) {
         return this.userRepository.getUserById(id);
+    }
+
+    public void purgeUnverifiedUsers(List<Long> ids) {
+        userRepository.purgeUnverifiedUsers(ids);
     }
 }

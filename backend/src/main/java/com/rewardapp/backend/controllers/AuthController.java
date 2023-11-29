@@ -3,8 +3,10 @@ package com.rewardapp.backend.controllers;
 import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.services.EmailSenderService;
+import com.rewardapp.backend.services.EmailTokenService;
 import com.rewardapp.backend.services.SessionService;
 import com.rewardapp.backend.services.UserService;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,11 +26,13 @@ public class AuthController {
     private final UserService userService;
     private final SessionService sessionService;
     private final EmailSenderService emailSenderService;
+    private final EmailTokenService emailTokenService;
 
-    public AuthController(UserService userService, SessionService sessionService, EmailSenderService emailSenderService) {
+    public AuthController(UserService userService, SessionService sessionService, EmailSenderService emailSenderService, EmailTokenService emailTokenService) {
         this.userService = userService;
         this.sessionService = sessionService;
         this.emailSenderService = emailSenderService;
+        this.emailTokenService = emailTokenService;
     }
 
     @PostMapping("/login")
@@ -89,5 +94,11 @@ public class AuthController {
         sessionService.logout(cookie.getValue());
 
         return null;
+    }
+
+    @PostConstruct
+    public void purgeUnverifiedUsers() {
+        List<Long> userIds = emailTokenService.purgeTokens();
+        userService.purgeUnverifiedUsers(userIds);
     }
 }
