@@ -57,6 +57,7 @@ public class MaintenanceService {
 
     @Scheduled(cron = "0 0 0 * * MON-SUN")
     public void purgeSessions() {
+        logger.info("Scheduler started task \"purgeUnverifiedUsers()\":");
         List<Session> sessions = sessionRepository.removeSessionsByExpirationDateBefore(Timestamp.valueOf(LocalDateTime.now()));
     }
 }

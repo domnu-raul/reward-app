@@ -21,7 +21,7 @@ public class UserService {
         this.internalUserRepository = internalUserRepository;
     }
 
-    public User validate(String username, String password) {
+    public User validateInternal(String username, String password) {
         User user = userRepository.getUserByUsername(username);
         InternalUser internalUser = internalUserRepository.getInternalUserById(user.getId());
 
@@ -32,7 +32,7 @@ public class UserService {
 
     }
 
-    public User register(String username, String email, String password) {
+    public User registerInternal(String username, String email, String password) {
         Pattern email_validation = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 
         if (!email_validation.matcher(email).matches())

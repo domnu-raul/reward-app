@@ -87,6 +87,7 @@ BACKEND STRUCTURE:
         Address?
 
         GeneralResponse(metadata + actual response)
+            ErrorResponse
             UserResponse
             SessionResponse
             VoucherResponse
@@ -112,6 +113,7 @@ BACKEND STRUCTURE:
                 users
                 api/recycling-centers/all GET
                 api/recycling-centers/{id} GET
+
                 admin_only
                 api/recycling-centers/(add) POST
                 api/recycling-centers/(delete) DELETE

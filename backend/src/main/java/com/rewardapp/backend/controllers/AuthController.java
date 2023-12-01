@@ -36,11 +36,9 @@ public class AuthController {
         String username = requestBody.get("username");
         String password = requestBody.get("password");
 
-        User user = userService.validate(username, password);
+        User user = userService.validateInternal(username, password);
 
         Session session = sessionService.create(user);
-
-        EntityModel<Session> response = EntityModel.of(session);
 
         Cookie cookie = new Cookie("session_id", session.getSessionId());
         cookie.setPath("/");
@@ -50,7 +48,7 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(response);
+                .body(EntityModel.of(session));
     }
 
     @PostMapping("/register")
@@ -59,14 +57,12 @@ public class AuthController {
         String email = requestBody.get("email");
         String password = requestBody.get("password");
 
-        User user = userService.register(username, email, password);
-        EntityModel<User> response = EntityModel.of(user);
-
+        User user = userService.registerInternal(username, email, password);
 //        emailSenderService.sendEmail("sir.c4ppuccin0@gmail.com", "test", "working");
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(EntityModel.of(user));
     }
 
     @DeleteMapping("/logout")

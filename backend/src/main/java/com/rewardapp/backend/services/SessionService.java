@@ -3,6 +3,7 @@ package com.rewardapp.backend.services;
 import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.repositories.SessionRepository;
+import com.rewardapp.backend.repositories.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
@@ -14,16 +15,18 @@ import java.util.Optional;
 @Service
 @Transactional
 public class SessionService {
-    private final SessionRepository repository;
+    private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
-    public SessionService(SessionRepository repository) {
-        this.repository = repository;
+    public SessionService(SessionRepository sessionRepository, UserRepository userRepository) {
+        this.sessionRepository = sessionRepository;
+        this.userRepository = userRepository;
     }
 
     public Session create(User user) {
         Session session = new Session();
         session.setUserId(user.getId());
-        return repository.save(session);
+        return sessionRepository.save(session);
     }
     
     public Session validateRequest(HttpServletRequest request) {
@@ -41,14 +44,24 @@ public class SessionService {
 
         String sessionId = sessionIdOptional.get();
 
-        Optional<Session> optionalSession = repository.findSessionBySessionId(sessionId);
-        if (optionalSession.isPresent())
-            return optionalSession.get();
+        Optional<Session> optionalSession = sessionRepository.findSessionBySessionId(sessionId);
+        if (optionalSession.isEmpty())
+            throw new RuntimeException("Invalid session.");
 
-        return null;
+        return optionalSession.get();
+    }
+
+    public Session validateAdminRequest(HttpServletRequest request) {
+        Session session = validateRequest(request);
+        User user = userRepository.getUserById(session.getUserId());
+
+        if (user.getType() == User.UserType.user)
+            throw new RuntimeException("Unauthorized.");
+
+        return session;
     }
     
     public void logout(String sessionId) {
-        repository.removeSessionBySessionId(sessionId);
+        sessionRepository.removeSessionBySessionId(sessionId);
     }
 }
