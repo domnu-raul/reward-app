@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {RuntimeException.class})
-    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
+    private ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
         Error e = new Error(ex.getClass().getName(), ex.getMessage(), LocalDateTime.now());
         EntityModel<Error> body = EntityModel.of(e);
 

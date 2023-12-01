@@ -17,7 +17,7 @@ public class Session {
     @Column(name = "session_id", unique = true, nullable = false)
     private String sessionId = UUID.randomUUID().toString();
     @Column(name = "expiration_date", nullable = false, columnDefinition = "DATE DEFAULT now() + '3 days'::interval")
-    private Timestamp expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(0L));
+    private Timestamp expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3L));
     @Column(name = "user_id", nullable = false)
     private Long userId;
 

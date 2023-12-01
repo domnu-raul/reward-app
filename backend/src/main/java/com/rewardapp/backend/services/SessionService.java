@@ -3,13 +3,12 @@ package com.rewardapp.backend.services;
 import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.repositories.SessionRepository;
-import jakarta.annotation.PostConstruct;
-import org.springframework.scheduling.annotation.Scheduled;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -26,22 +25,30 @@ public class SessionService {
         session.setUserId(user.getId());
         return repository.save(session);
     }
+    
+    public Session validateRequest(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null)
+            throw new RuntimeException("Empty cookie jar.");
 
-    public Session validate(String sessionId) {
+        Optional<String> sessionIdOptional = Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals("session_id"))
+                .map(Cookie::getValue)
+                .findAny();
+
+        if (sessionIdOptional.isEmpty())
+            throw new RuntimeException("You must be logged in.");
+
+        String sessionId = sessionIdOptional.get();
+
         Optional<Session> optionalSession = repository.findSessionBySessionId(sessionId);
         if (optionalSession.isPresent())
             return optionalSession.get();
 
         return null;
     }
-
+    
     public void logout(String sessionId) {
         repository.removeSessionBySessionId(sessionId);
-    }
-
-    @PostConstruct
-    @Scheduled(cron = "0 0 0 * * MON-SUN")
-    public void purgeSessions() {
-        repository.removeSessionsByExpirationDateBefore(Timestamp.valueOf(LocalDateTime.now()));
     }
 }

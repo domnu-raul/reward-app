@@ -3,7 +3,6 @@ package com.rewardapp.backend.repositories;
 import com.rewardapp.backend.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM User WHERE verified = false  AND id IN :ids")
-    public void purgeUnverifiedUsers(List<Long> ids);
+    public List<User> deleteUsersByIdInAndVerified(List<Long> ids, Boolean verified);
 }

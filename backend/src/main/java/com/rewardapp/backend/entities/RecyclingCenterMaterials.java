@@ -20,13 +20,14 @@ public class RecyclingCenterMaterials {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "recycling_center_id", columnDefinition = "INT FOREIGN KEY REFERENCES recycling_centers(id)")
-    private RecyclingCenter recyclingCenter;
 
     @Column(name = "material", columnDefinition = "material_type")
     @Enumerated(EnumType.STRING)
     private MaterialType material;
+
+    @ManyToOne
+    @JoinColumn(name = "recycling_center_id", columnDefinition = "INT FOREIGN KEY REFERENCES recycling_centers(id)")
+    private RecyclingCenter recyclingCenter;
 
     public Long getId() {
         return id;
@@ -42,6 +43,10 @@ public class RecyclingCenterMaterials {
 
     public void setMaterial(MaterialType material) {
         this.material = material;
+    }
+
+    public void setRecyclingCenter(RecyclingCenter recyclingCenter) {
+        this.recyclingCenter = recyclingCenter;
     }
 
     @Override

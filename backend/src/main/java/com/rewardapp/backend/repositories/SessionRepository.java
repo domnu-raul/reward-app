@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,8 +14,9 @@ public interface SessionRepository extends JpaRepository<Session, Integer> {
     public Session getSessionById(Integer id);
     public Optional<Session> findSessionBySessionId(String sessionId);
 
-    public void removeSessionBySessionId(String sessionId);
+    @Transactional
+    public Session removeSessionBySessionId(String sessionId);
 
     @Transactional
-    public void removeSessionsByExpirationDateBefore(Timestamp timestamp);
+    public List<Session> removeSessionsByExpirationDateBefore(Timestamp timestamp);
 }

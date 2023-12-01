@@ -1,6 +1,9 @@
 learn to use JPA with user-defined types, enums, and arrays.
 add loggers.
 
+give up json
+create a one-to-one between centers and locations.
+
 make a DataMaintenanceService, that has scheduled tasks to purge data such as expired sessions or unverified users.
 OR
 schedule the tasks in PSQL.
@@ -45,7 +48,7 @@ FRONT-END FUNCTIONALITIES:
             RESET button, resets filters, sorts, and searches.
 
             Sort
-                by location
+                by recyclingCenterLocation
                 by name
                 by type accepted
             No sort button, use the columns.
@@ -62,7 +65,7 @@ FRONT-END FUNCTIONALITIES:
 
     - Dashboard page(Admin):
         Add new center:
-            location(map, searchable, enforce proper location data and geocoding)
+            recyclingCenterLocation(map, searchable, enforce proper recyclingCenterLocation data and geocoding)
             materials(dropdown, searchable)
             name(text-field)
             working hours(2 time selectors)
@@ -173,7 +176,7 @@ DB STRUCTURE:
         id - serial pk
         name - varchar(255)
         materials - material_type[]
-        location - location_type
+        recyclingCenterLocation - location_type
         starting_time -  TIME
         end_time - TIME
 
@@ -209,15 +212,15 @@ DB STRUCTURE:
             county VARCHAR(50),
             city VARCHAR(50),
             address VARCHAR(255),
-            postal_code VARCHAR(20)
+            postal_code VARCHAR(20),
+
             coordinates geography(Point, 4326)
 
 // new recycling center query
-INSERT INTO RECYCLING_CENTERS (name, materials, location, starting_time, end_time)
+INSERT INTO RECYCLING_CENTERS (name, recyclingCenterLocation, starting_time, end_time)
 VALUES (
     'New Recycling Center',
-    ARRAY['PLASTIC'::material_type, 'METAL'::material_type],
-     ('Cluj', 'Cluj-Napoca', 'Some Street', '123456', 'POINT(45.747470 21.217110)'::geography)::location_type,
+     ('Cluj', 'Cluj-Napoca', 'Some Street', '123456', 45.747470, 21.217110)::location_type,
     '08:00:00',
     '17:00:00'
 )

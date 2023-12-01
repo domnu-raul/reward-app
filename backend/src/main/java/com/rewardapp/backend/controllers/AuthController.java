@@ -6,7 +6,6 @@ import com.rewardapp.backend.services.EmailSenderService;
 import com.rewardapp.backend.services.EmailTokenService;
 import com.rewardapp.backend.services.SessionService;
 import com.rewardapp.backend.services.UserService;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/auth")
@@ -75,30 +71,12 @@ public class AuthController {
 
     @DeleteMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null)
-            throw new RuntimeException("Empty cookie jar.");
-
-        Optional<Cookie> sessionCookieOptional = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals("session_id"))
-                .findAny();
-
-        if (sessionCookieOptional.isEmpty())
+        Session session = sessionService.validateRequest(request);
+        if (session == null)
             throw new RuntimeException("You are not logged in.");
 
-        Cookie cookie = sessionCookieOptional.get();
-        cookie.setMaxAge(0);
-
-        response.addCookie(cookie);
-
-        sessionService.logout(cookie.getValue());
+        sessionService.logout(session.getSessionId());
 
         return null;
-    }
-
-    @PostConstruct
-    public void purgeUnverifiedUsers() {
-        List<Long> userIds = emailTokenService.purgeTokens();
-        userService.purgeUnverifiedUsers(userIds);
     }
 }
