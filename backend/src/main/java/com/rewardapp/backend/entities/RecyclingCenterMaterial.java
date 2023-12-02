@@ -6,27 +6,18 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "recycling_centers_materials")
-public class RecyclingCenterMaterials {
-    public static enum MaterialType {
-        PLASTIC,
-        METAL,
-        PAPER,
-        GLASS,
-        ALUMINUM_CANS,
-        E_WASTE
-    }
-
+public class RecyclingCenterMaterial {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "material", columnDefinition = "material_type")
-    @Enumerated(EnumType.STRING)
-    private MaterialType material;
+    @ManyToOne
+    @JoinColumn(name = "material_id")
+    private Material material;
 
     @ManyToOne
-    @JoinColumn(name = "recycling_center_id", columnDefinition = "INT FOREIGN KEY REFERENCES recycling_centers(id)")
+    @JoinColumn(name = "recycling_center_id")
     private RecyclingCenter recyclingCenter;
 
     public Long getId() {
@@ -37,11 +28,11 @@ public class RecyclingCenterMaterials {
         this.id = id;
     }
 
-    public MaterialType getMaterial() {
+    public Material getMaterial() {
         return material;
     }
 
-    public void setMaterial(MaterialType material) {
+    public void setMaterial(Material material) {
         this.material = material;
     }
 
@@ -53,7 +44,7 @@ public class RecyclingCenterMaterials {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RecyclingCenterMaterials that = (RecyclingCenterMaterials) o;
+        RecyclingCenterMaterial that = (RecyclingCenterMaterial) o;
         return Objects.equals(id, that.id) && Objects.equals(recyclingCenter, that.recyclingCenter) && material == that.material;
     }
 

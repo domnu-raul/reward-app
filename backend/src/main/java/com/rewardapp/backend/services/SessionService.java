@@ -55,12 +55,12 @@ public class SessionService {
         Session session = validateRequest(request);
         User user = userRepository.getUserById(session.getUserId());
 
-        if (user.getType() == User.UserType.user)
+        if (user.getType() == User.UserType.ADMIN)
             throw new RuntimeException("Unauthorized.");
 
         return session;
     }
-    
+
     public void logout(String sessionId) {
         sessionRepository.removeSessionBySessionId(sessionId);
     }

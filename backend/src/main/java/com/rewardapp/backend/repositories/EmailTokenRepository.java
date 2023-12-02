@@ -14,4 +14,5 @@ public interface EmailTokenRepository extends JpaRepository<EmailToken, Long> {
     @Transactional
     public List<EmailToken> removeEmailTokenByExpirationDateBefore(Timestamp timestamp);
 
+    public EmailToken getEmailTokenByToken(String token);
 }

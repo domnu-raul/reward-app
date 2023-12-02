@@ -2,20 +2,21 @@ package com.rewardapp.backend.entities;
 
 import jakarta.persistence.*;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 public class User {
     public static enum UserType {
-        admin, user;
+        USER, ADMIN;
     };
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "users_id_seq")
     protected Long id;
     @Column(name = "username", nullable = false, unique = true)
     protected String username;
@@ -24,11 +25,11 @@ public class User {
     @Column(name = "verified", columnDefinition = "BOOLEAN DEFAULT FALSE")
     protected Boolean verified = false;
     @Column(name = "register_date", columnDefinition = "DATE DEFAULT now()")
-    protected Timestamp register_date = Timestamp.valueOf(LocalDateTime.now());
+    protected Date register_date = Date.valueOf(LocalDate.now());
 
     @Column(name = "type", columnDefinition = "USER_TYPE DEFAULT 'user'::user_type")
     @Enumerated(EnumType.STRING)
-    protected UserType type = UserType.user;
+    protected UserType type = UserType.USER;
 
     public Long getId() {
         return id;
@@ -62,11 +63,11 @@ public class User {
         this.verified = verified;
     }
 
-    public Timestamp getRegister_date() {
+    public Date getRegister_date() {
         return register_date;
     }
 
-    public void setRegister_date(Timestamp register_date) {
+    public void setRegister_date(Date register_date) {
         this.register_date = register_date;
     }
 

@@ -3,49 +3,29 @@ package com.rewardapp.backend.entities;
 import jakarta.persistence.*;
 
 import java.sql.Time;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "recycling_centers")
 public class RecyclingCenter {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "recycling_centers_id_seq")
     private long id;
     @Column(name = "name", nullable = false)
     private String name;
+
     @OneToMany(mappedBy = "recyclingCenter", cascade = CascadeType.ALL)
-    private List<RecyclingCenterMaterials> materials = new ArrayList<>();
-    @OneToOne(mappedBy = "recyclingCenter", cascade = CascadeType.ALL, optional = false)
+    private List<RecyclingCenterMaterial> recyclingCenterMaterials;
+    @OneToOne(mappedBy = "recyclingCenter", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    private RecyclingCenterLocation location;
-    @Column(name = "starting_time")
+    private RecyclingCenterLocation recyclingCenterLocation;
+    @Column(name = "start_time")
     private Time startingTime;
     @Column(name = "end_time")
     private Time endTime;
-
-
-    public List<RecyclingCenterMaterials.MaterialType> getMaterials() {
-        return materials
-                .stream()
-                .map(center -> center.getMaterial())
-                .collect(Collectors.toList());
-    }
-
-    public void setMaterials(List<RecyclingCenterMaterials.MaterialType> materials) {
-        this.materials = materials
-                .stream()
-                .map(materialType -> {
-                    RecyclingCenterMaterials material = new RecyclingCenterMaterials();
-                    material.setMaterial(materialType);
-                    material.setRecyclingCenter(this);
-                    return material;
-                })
-                .collect(Collectors.toList());
-    }
 
     public long getId() {
         return id;
@@ -63,13 +43,20 @@ public class RecyclingCenter {
         this.name = name;
     }
 
-    public RecyclingCenterLocation getLocation() {
-        return location;
+    public List<RecyclingCenterMaterial> getRecyclingCenterMaterials() {
+        return recyclingCenterMaterials;
     }
 
-    public void setLocation(RecyclingCenterLocation recyclingCenterLocation) {
-        this.location = recyclingCenterLocation;
-        this.location.setRecyclingCenter(this);
+    public void setRecyclingCenterMaterials(List<RecyclingCenterMaterial> recyclingCenterMaterials) {
+        this.recyclingCenterMaterials = recyclingCenterMaterials;
+    }
+
+    public RecyclingCenterLocation getRecyclingCenterLocation() {
+        return recyclingCenterLocation;
+    }
+
+    public void setRecyclingCenterLocation(RecyclingCenterLocation recyclingCenterLocation) {
+        this.recyclingCenterLocation = recyclingCenterLocation;
     }
 
     public Time getStartingTime() {
@@ -93,11 +80,11 @@ public class RecyclingCenter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RecyclingCenter that = (RecyclingCenter) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(materials, that.materials) && Objects.equals(location, that.location) && Objects.equals(startingTime, that.startingTime) && Objects.equals(endTime, that.endTime);
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(recyclingCenterMaterials, that.recyclingCenterMaterials) && Objects.equals(recyclingCenterLocation, that.recyclingCenterLocation) && Objects.equals(startingTime, that.startingTime) && Objects.equals(endTime, that.endTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, materials, location, startingTime, endTime);
+        return Objects.hash(id, name, recyclingCenterMaterials, recyclingCenterLocation, startingTime, endTime);
     }
 }

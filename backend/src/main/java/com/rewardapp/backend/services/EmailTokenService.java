@@ -16,4 +16,8 @@ public class EmailTokenService {
         token.setUserId(userId);
         repository.save(token);
     }
+
+    public EmailToken getByEmailToken(String emailToken) {
+        return repository.getEmailTokenByToken(emailToken);
+    }
 }

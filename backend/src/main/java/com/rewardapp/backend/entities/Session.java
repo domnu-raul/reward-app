@@ -2,8 +2,8 @@ package com.rewardapp.backend.entities;
 
 import jakarta.persistence.*;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -11,13 +11,14 @@ import java.util.UUID;
 @Table(name = "sessions")
 public class Session {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "sessions_id_seq")
     private Long id;
     @Column(name = "session_id", unique = true, nullable = false)
     private String sessionId = UUID.randomUUID().toString();
     @Column(name = "expiration_date", nullable = false, columnDefinition = "DATE DEFAULT now() + '3 days'::interval")
-    private Timestamp expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3L));
+    private Date expirationDate = Date.valueOf(LocalDate.now().plusDays(3L));
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
@@ -37,11 +38,11 @@ public class Session {
         this.sessionId = session_id;
     }
 
-    public Timestamp getExpirationDate() {
+    public Date getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Timestamp expiration_date) {
+    public void setExpirationDate(Date expiration_date) {
         this.expirationDate = expiration_date;
     }
 

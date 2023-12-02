@@ -56,6 +56,11 @@ public class UserService {
         return user;
     }
 
+    public User setVerified(Long userId) {
+        userRepository.setVerified(userId);
+        return userRepository.getUserById(userId);
+    }
+
     public User getUserByUsername(String username) {
         return this.userRepository.getUserByUsername(username);
     }

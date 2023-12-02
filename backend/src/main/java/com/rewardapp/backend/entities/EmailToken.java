@@ -2,8 +2,8 @@ package com.rewardapp.backend.entities;
 
 import jakarta.persistence.*;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -11,13 +11,14 @@ import java.util.UUID;
 @Table(name = "email_tokens")
 public class EmailToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "email_tokens_id_seq")
     private Long id;
     @Column(name = "token", nullable = false, unique = true)
     private String token = UUID.randomUUID().toString();
     @Column(name = "expiration_date")
-    private Timestamp expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(30L));
+    private Date expirationDate = Date.valueOf(LocalDate.now().plusDays(30L));
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
@@ -37,11 +38,11 @@ public class EmailToken {
         this.token = token;
     }
 
-    public Timestamp getExpirationDate() {
+    public Date getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Timestamp expirationDate) {
+    public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
     }
 

@@ -1,5 +1,6 @@
 package com.rewardapp.backend.controllers;
 
+import com.rewardapp.backend.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.entities.RecyclingCenter;
 import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.services.RecyclingCenterService;
@@ -19,21 +20,20 @@ public class RecyclingCenterController {
     private final RecyclingCenterService recyclingCenterService;
     private final SessionService sessionService;
 
-
     public RecyclingCenterController(RecyclingCenterService recyclingCenterService, SessionService sessionService) {
         this.recyclingCenterService = recyclingCenterService;
         this.sessionService = sessionService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<RecyclingCenter>> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<RecyclingCenterDTO>> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
 
-        RecyclingCenter recyclingCenter = recyclingCenterService.getRecyclingCenterById(id);
+        RecyclingCenterDTO recyclingCenterDTO = recyclingCenterService.getRecyclingCenterById(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(EntityModel.of(recyclingCenter));
+                .body(EntityModel.of(recyclingCenterDTO));
     }
 
     @GetMapping("/all")
@@ -47,14 +47,14 @@ public class RecyclingCenterController {
                 .body(CollectionModel.of(recyclingCenters));
     }
     @PostMapping()
-    public ResponseEntity<EntityModel<RecyclingCenter>> create(@RequestBody RecyclingCenter recyclingCenter, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<RecyclingCenterDTO>> create(@RequestBody RecyclingCenterDTO recyclingCenterDTO, HttpServletRequest request) {
         Session session = sessionService.validateAdminRequest(request);
 
-        recyclingCenter = recyclingCenterService.create(recyclingCenter);
+        recyclingCenterDTO = recyclingCenterService.create(recyclingCenterDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(EntityModel.of(recyclingCenter));
+                .body(EntityModel.of(recyclingCenterDTO));
     }
 
 

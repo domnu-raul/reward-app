@@ -1,5 +1,6 @@
 package com.rewardapp.backend.controllers;
 
+import com.rewardapp.backend.entities.EmailToken;
 import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.services.EmailSenderService;
@@ -62,6 +63,18 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
+                .body(EntityModel.of(user));
+    }
+
+    @PutMapping("/verify/{email_token}")
+    public ResponseEntity<EntityModel<User>> verifyEmail(@PathVariable("email_token") String token) {
+        EmailToken emailToken = emailTokenService.getByEmailToken(token);
+        Long userId = emailToken.getUserId();
+
+        User user = userService.setVerified(userId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .body(EntityModel.of(user));
     }
 

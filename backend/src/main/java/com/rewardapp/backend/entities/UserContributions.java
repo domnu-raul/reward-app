@@ -8,9 +8,16 @@ import java.util.Objects;
 @Entity
 @Table(name = "contributions")
 public class UserContributions {
+    public static enum MeasurmentType {
+        PIECE,
+        KG,
+        G
+    }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "contributions_id_seq")
     private Long id;
 
     @ManyToOne
@@ -23,12 +30,25 @@ public class UserContributions {
     @Column(name = "timestamp", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Timestamp timestamp;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RecyclingCenterMaterials.MaterialType material;
+    @OneToOne
+    @JoinColumn(name = "material_id")
+    private Material material;
 
     @Column(nullable = false)
     private int quantity;
+
+    @Column(name = "measurment", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MeasurmentType measurment;
+
+
+    public MeasurmentType getMeasurment() {
+        return measurment;
+    }
+
+    public void setMeasurment(MeasurmentType measurment) {
+        this.measurment = measurment;
+    }
 
     public Long getId() {
         return id;
@@ -62,11 +82,11 @@ public class UserContributions {
         this.timestamp = timestamp;
     }
 
-    public RecyclingCenterMaterials.MaterialType getMaterial() {
+    public Material getMaterial() {
         return material;
     }
 
-    public void setMaterial(RecyclingCenterMaterials.MaterialType material) {
+    public void setMaterial(Material material) {
         this.material = material;
     }
 
@@ -83,11 +103,11 @@ public class UserContributions {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserContributions that = (UserContributions) o;
-        return quantity == that.quantity && Objects.equals(id, that.id) && Objects.equals(userData, that.userData) && Objects.equals(recyclingCenterId, that.recyclingCenterId) && Objects.equals(timestamp, that.timestamp) && material == that.material;
+        return quantity == that.quantity && Objects.equals(id, that.id) && Objects.equals(userData, that.userData) && Objects.equals(recyclingCenterId, that.recyclingCenterId) && Objects.equals(timestamp, that.timestamp) && material == that.material && measurment == that.measurment;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userData, recyclingCenterId, timestamp, material, quantity);
+        return Objects.hash(id, userData, recyclingCenterId, timestamp, material, quantity, measurment);
     }
 }

@@ -1,12 +1,14 @@
-learn to use JPA with user-defined types, enums, and arrays.
-add loggers.
+Enforce measurments and material types into contributions.
+Add reward system(maybe a trigger) to contributions.
 
-give up json
-create a one-to-one between centers and locations.
+TABLE reward_system:
+    MATERIAL - MEASURMENT - REWARD
+    Trigger at insert into contribution will search for a pair and calculate the rewawrd points by multiplying REWARD with QUANTITY.
 
-make a DataMaintenanceService, that has scheduled tasks to purge data such as expired sessions or unverified users.
-OR
-schedule the tasks in PSQL.
+Add PurchaseOptions table.
+Add Vouchers table.
+Add Purchases table.
+Add GoogleUsers.
 
 EXCEPTIONS:
     IncorrectPasswordException
@@ -17,7 +19,7 @@ EXCEPTIONS:
     SessionCreationException
     InvalidSessionException
 
-
+    InvalidDataException
 
 FRONT-END FUNCTIONALITIES:
     - Registration page:
@@ -73,6 +75,24 @@ FRONT-END FUNCTIONALITIES:
             Save button:
                 returns error("ALL FIELDS MANDATORY").
                 properly commits to the database and updates the list in real time.
+
+    - Points:
+        PAPER - PIECE - 2 points per piece
+        METAL - dkg/kg - 100 points per kg
+        E-WASTE - PIECE - 30 points per piece
+        PLASTIC - dkg/kg/g - 150 points per kg
+        GLASS - dkg/kg/g - 50 points per kg;
+        ALUMINUM_CANS PIECE - 5 points per piece
+
+    - Purchase Options:
+        100 points:
+            10 lei
+        250 points:
+            30 lei
+        500 points:
+            75 lei
+        1000 points:
+            100 lei
 
 BACKEND STRUCTURE:
     project:
@@ -182,7 +202,7 @@ DB STRUCTURE:
         starting_time -  TIME
         end_time - TIME
 
-    CONTRIBUTIONS:
+    CONTRIBUTIONS: // exists
         id - int pk
         user_id - int fk users(id)
         recycling_center_id - int fk recycling_centers(id)
@@ -191,14 +211,17 @@ DB STRUCTURE:
         quantity - INT
         measurment - measurment?
 
-
     VOUCHERS:
         id - serial pk
-        code - varchar(80)
+        user_id - int fk users(id)
+        option_id - int fk purchase_options(id);
+        code - varchar(80) -- uuid;
+
+    PURCHASE_OPTIONS:
+        id - int pk
         value - int
         cost - int
-        user_id - int fk users(id)
-
+        currency - currency_type
 
     CUSTOM_TYPES:
         ENUM user_type ('admin', 'user')

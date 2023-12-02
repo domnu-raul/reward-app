@@ -24,8 +24,8 @@ public class RecyclingCenterLocation {
     private Double latitude;
 
     @OneToOne
-    @MapsId
     @JoinColumn(name = "recycling_center_id")
+    @MapsId
     private RecyclingCenter recyclingCenter;
 
     public Long getId() {
@@ -84,13 +84,16 @@ public class RecyclingCenterLocation {
         this.latitude = latitude;
     }
 
+    public RecyclingCenter getRecyclingCenter() {
+        return recyclingCenter;
+    }
+
     public void setRecyclingCenter(RecyclingCenter recyclingCenter) {
         this.recyclingCenter = recyclingCenter;
     }
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RecyclingCenterLocation that = (RecyclingCenterLocation) o;

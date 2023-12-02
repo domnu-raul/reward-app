@@ -8,7 +8,7 @@ import java.util.Objects;
 @Table(name = "internal_users")
 public class InternalUser {
     @Id
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long id;
     @Column(name = "password")
     private String password;
