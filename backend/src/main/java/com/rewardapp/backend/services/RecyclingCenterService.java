@@ -4,6 +4,8 @@ import com.rewardapp.backend.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.entities.RecyclingCenter;
 import com.rewardapp.backend.mappers.Mapper;
 import com.rewardapp.backend.mappers.RecyclingCenterMapper;
+import com.rewardapp.backend.repositories.RecyclingCenterLocationRepository;
+import com.rewardapp.backend.repositories.RecyclingCenterMaterialRepository;
 import com.rewardapp.backend.repositories.RecyclingCenterRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +17,14 @@ import java.util.stream.Collectors;
 @Transactional
 public class RecyclingCenterService {
     private final RecyclingCenterRepository recyclingCenterRepository;
+    private final RecyclingCenterLocationRepository recyclingCenterLocationRepository;
+    private final RecyclingCenterMaterialRepository recyclingCenterMaterialRepository;
     private final Mapper<RecyclingCenter, RecyclingCenterDTO> recyclingCenterMapper;
 
-    public RecyclingCenterService(RecyclingCenterRepository recyclingCenterRepository, RecyclingCenterMapper recyclingCenterMapper) {
+    public RecyclingCenterService(RecyclingCenterRepository recyclingCenterRepository, RecyclingCenterLocationRepository recyclingCenterLocationRepository, RecyclingCenterMaterialRepository recyclingCenterMaterialRepository, RecyclingCenterMapper recyclingCenterMapper) {
         this.recyclingCenterRepository = recyclingCenterRepository;
+        this.recyclingCenterLocationRepository = recyclingCenterLocationRepository;
+        this.recyclingCenterMaterialRepository = recyclingCenterMaterialRepository;
         this.recyclingCenterMapper = recyclingCenterMapper;
     }
 
@@ -42,22 +48,35 @@ public class RecyclingCenterService {
 
     public RecyclingCenterDTO update(Long id, RecyclingCenterDTO recyclingCenterDTO) {
         RecyclingCenter recyclingCenter = recyclingCenterRepository.getRecyclingCenterById(id);
-        RecyclingCenterDTO oldRecyclingCenterDTO = recyclingCenterMapper.mapToDTO(recyclingCenter);
-        recyclingCenterRepository.delete(recyclingCenter);
+        RecyclingCenter updatedRecyclingCenter = recyclingCenterMapper.mapToEntity(recyclingCenterDTO);
 
-        RecyclingCenterDTO newRecyclingCenterDTO = new RecyclingCenterDTO(
-                id,
-                recyclingCenterDTO.name() != null ? recyclingCenterDTO.name() : oldRecyclingCenterDTO.name(),
-                recyclingCenterDTO.materials() != null ? recyclingCenterDTO.materials() : oldRecyclingCenterDTO.materials(),
-                recyclingCenterDTO.location() != null ? recyclingCenterDTO.location() : oldRecyclingCenterDTO.location(),
-                recyclingCenterDTO.startingTime() != null ? recyclingCenterDTO.startingTime() : oldRecyclingCenterDTO.startingTime(),
-                recyclingCenterDTO.endTime() != null ? recyclingCenterDTO.endTime() : oldRecyclingCenterDTO.endTime()
-        );
-        recyclingCenter = recyclingCenterMapper.mapToEntity(newRecyclingCenterDTO);
-        recyclingCenter.setId(id);
+        if (updatedRecyclingCenter.getName() != null)
+            recyclingCenter.setName(updatedRecyclingCenter.getName());
+        if (updatedRecyclingCenter.getStartingTime() != null)
+            recyclingCenter.setStartingTime(updatedRecyclingCenter.getStartingTime());
+        if (updatedRecyclingCenter.getEndTime() != null)
+            recyclingCenter.setEndTime(updatedRecyclingCenter.getEndTime());
+        if (updatedRecyclingCenter.getRecyclingCenterMaterials() != null) {
+            recyclingCenter.getRecyclingCenterMaterials()
+                    .stream()
+                    .forEach(x -> recyclingCenterMaterialRepository.delete(x));
+
+            recyclingCenter.setRecyclingCenterMaterials(
+                    updatedRecyclingCenter.getRecyclingCenterMaterials()
+            );
+        }
+        if (updatedRecyclingCenter.getRecyclingCenterLocation() != null) {
+            recyclingCenterLocationRepository.delete(
+                    recyclingCenter.getRecyclingCenterLocation()
+            );
+
+            recyclingCenter.setRecyclingCenterLocation(
+                    updatedRecyclingCenter.getRecyclingCenterLocation()
+            );
+        }
 
         recyclingCenterRepository.save(recyclingCenter);
-        return newRecyclingCenterDTO;
+        return recyclingCenterMapper.mapToDTO(recyclingCenter);
     }
 
     public List<RecyclingCenterDTO> getAll() {
