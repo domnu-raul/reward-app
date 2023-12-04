@@ -5,6 +5,7 @@ DONE: Add PurchaseOptions table.
 DONE: Add Vouchers table.
 DONE: Add Purchases table.
 Add GoogleUsers.
+Refactor to JDBC? Search which is better.
 
 Mappers and DTO:
     Contribution

@@ -13,11 +13,11 @@ public class RecyclingCenter {
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "recycling_centers_id_seq")
-    private long id;
+    private Long id;
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "recyclingCenter", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recyclingCenter", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RecyclingCenterMaterial> recyclingCenterMaterials;
     @OneToOne(mappedBy = "recyclingCenter", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
@@ -27,11 +27,11 @@ public class RecyclingCenter {
     @Column(name = "end_time")
     private Time endTime;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
