@@ -86,7 +86,7 @@ public class RecyclingCenterService {
             currentMaterials.removeAll(removed);
             currentMaterials.addAll(additions);
 
-            recyclingCenterMaterialRepository.deleteAllInBatch(removed);
+            recyclingCenterMaterialRepository.deleteAll(removed);
             recyclingCenterMaterialRepository.saveAll(additions);
         }
 

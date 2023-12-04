@@ -1,7 +1,7 @@
 package com.rewardapp.backend.repositories;
 
 import com.rewardapp.backend.entities.EmailToken;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EmailTokenRepository extends JpaRepository<EmailToken, Long> {
+public interface EmailTokenRepository extends CrudRepository<EmailToken, Long> {
 
     @Transactional
     public List<EmailToken> removeEmailTokenByExpirationDateBefore(Timestamp timestamp);

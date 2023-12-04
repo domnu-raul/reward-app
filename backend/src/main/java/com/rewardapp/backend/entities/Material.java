@@ -1,42 +1,23 @@
 package com.rewardapp.backend.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.Immutable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.Objects;
-
-@Immutable
-@Entity
-@Table(name = "materials")
+@Table("materials")
+@Getter
+@ToString
+@RequiredArgsConstructor
+@EqualsAndHashCode
 public class Material {
     @Id
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @Column(name = "name")
+    @Column("name")
     private String name;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Material material = (Material) o;
-        return Objects.equals(id, material.id) && Objects.equals(name, material.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
 }
