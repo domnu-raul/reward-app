@@ -9,8 +9,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "users")
 public class User {
-    public static enum UserType {
-        USER, ADMIN;
+    public enum UserType {
+        ADMIN, USER;
     };
 
     @Id

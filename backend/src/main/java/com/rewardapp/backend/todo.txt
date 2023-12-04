@@ -1,25 +1,29 @@
-Enforce measurments and material types into contributions.
-Add reward system(maybe a trigger) to contributions.
-
-TABLE reward_system:
-    MATERIAL - MEASURMENT - REWARD
-    Trigger at insert into contribution will search for a pair and calculate the rewawrd points by multiplying REWARD with QUANTITY.
-
-Add PurchaseOptions table.
-Add Vouchers table.
-Add Purchases table.
+DONE: Enforce measurments and material types into contributions.
+DONE: Add reward system(maybe a trigger) to contributions.
+DONE: SQL View to find the reward points of the user, the impact they had, and the money they earned.
+DONE: Add PurchaseOptions table.
+DONE: Add Vouchers table.
+DONE: Add Purchases table.
 Add GoogleUsers.
+
+Mappers and DTO:
+    Contribution
+    Purchase
+    Session
+    User
 
 EXCEPTIONS:
     IncorrectPasswordException
     UserNotFoundException
-    UserAlreadyExistsException
+    UsernameTakenException
+    EmailTakenException
     InvalidEmailException
 
-    SessionCreationException
-    InvalidSessionException
+    UnauthorizedException
 
+    InvalidSessionException
     InvalidDataException
+    ResourceNotFoundException
 
 FRONT-END FUNCTIONALITIES:
     - Registration page:
@@ -125,7 +129,7 @@ BACKEND STRUCTURE:
                 api/auth/logout POST
                 api/auth/verify POST
                 api/auth/register POST
-                api/auth/update PUT
+                api/auth/update PATCH **
 
         logged in
         RecyclingCenterController
@@ -137,7 +141,7 @@ BACKEND STRUCTURE:
                 admin_only
                 api/recycling-centers/(add) POST
                 api/recycling-centers/(delete) DELETE
-                api/recycling-centers/(update) PUT
+                api/recycling-centers/(update) PATCH
 
         VoucherController
             uses the SessionServiImplement proper validation and potentially integrate with backend validation.
@@ -156,6 +160,10 @@ ce and the UserService to get user specific data
                 api/contributions/{id} GET
                 api/contributions/(add) POST
 
+        PurchaseController
+            PATHS:
+            api/purchases/all GET
+
     Services:
         Auth
             UserService
@@ -171,81 +179,4 @@ ce and the UserService to get user specific data
 
 
 DB STRUCTURE:
-    USERS: // exists
-        id - serial pk
-        username - varchar(80)
-        email - varchar(255)
-        verified - bool - false
-        register_date - date - current_date
-        type - user_type - 'user'
-
-        INTERNAL_USERS:
-            password - varchar(255);
-
-    SESSIONS: // exists
-        id - serial pk
-        session_id - varchar(255)
-        exp_date - date - now() + 3 days
-        user_id - int fk users(id)
-
-    EMAIL_TOKENS: // exists
-        id - serial pk
-        token - varchar(255) not null
-        exp_date - date - now() + 30 days
-        user_id - int fk users(id)
-
-    RECYCLING_CENTERS: // exists
-        id - serial pk
-        name - varchar(255)
-        materials - material_type[]
-        recyclingCenterLocation - location_type
-        starting_time -  TIME
-        end_time - TIME
-
-    CONTRIBUTIONS: // exists
-        id - int pk
-        user_id - int fk users(id)
-        recycling_center_id - int fk recycling_centers(id)
-        timestamp-  TIMESTAMP - now()
-        material - material
-        quantity - INT
-        measurment - measurment?
-
-    VOUCHERS:
-        id - serial pk
-        user_id - int fk users(id)
-        option_id - int fk purchase_options(id);
-        code - varchar(80) -- uuid;
-
-    PURCHASE_OPTIONS:
-        id - int pk
-        value - int
-        cost - int
-        currency - currency_type
-
-    CUSTOM_TYPES:
-        ENUM user_type ('admin', 'user')
-        ENUM material_type
-            'PLASTIC',
-             'METAL',
-             'PAPER',
-             'GLASS',
-             'ALUMINUM_CANS',
-             'E_WASTE'
-
-        location_type
-            county VARCHAR(50),
-            city VARCHAR(50),
-            address VARCHAR(255),
-            postal_code VARCHAR(20),
-
-            coordinates geography(Point, 4326)
-
-// new recycling center query
-INSERT INTO RECYCLING_CENTERS (name, recyclingCenterLocation, starting_time, end_time)
-VALUES (
-    'New Recycling Center',
-     ('Cluj', 'Cluj-Napoca', 'Some Street', '123456', 45.747470, 21.217110)::location_type,
-    '08:00:00',
-    '17:00:00'
-)
+    https://drawsql.app/teams/solo-153/diagrams/reward-app

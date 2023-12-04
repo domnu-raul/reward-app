@@ -29,7 +29,7 @@ public class RecyclingCenterController {
     public ResponseEntity<EntityModel<RecyclingCenterDTO>> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
 
-        RecyclingCenterDTO recyclingCenterDTO = recyclingCenterService.getRecyclingCenterById(id);
+        RecyclingCenterDTO recyclingCenterDTO = recyclingCenterService.getRecyclingCenterDTOById(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -37,15 +37,16 @@ public class RecyclingCenterController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<CollectionModel<RecyclingCenter>> getAll(HttpServletRequest request) {
+    public ResponseEntity<CollectionModel<RecyclingCenterDTO>> getAll(HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
 
-        List<RecyclingCenter> recyclingCenters = recyclingCenterService.getAll();
+        List<RecyclingCenterDTO> recyclingCenters = recyclingCenterService.getAll();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CollectionModel.of(recyclingCenters));
     }
+
     @PostMapping()
     public ResponseEntity<EntityModel<RecyclingCenterDTO>> create(@RequestBody RecyclingCenterDTO recyclingCenterDTO, HttpServletRequest request) {
         Session session = sessionService.validateAdminRequest(request);
@@ -58,5 +59,24 @@ public class RecyclingCenterController {
     }
 
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id, HttpServletRequest request) {
+        Session session = sessionService.validateAdminRequest(request);
 
+        RecyclingCenter recyclingCenter = recyclingCenterService.getRecyclingCenterById(id);
+
+        recyclingCenterService.delete(recyclingCenter);
+
+        return null;
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<EntityModel<RecyclingCenterDTO>> update(@PathVariable("id") Long id, @RequestBody RecyclingCenterDTO recyclingCenterDTO, HttpServletRequest request) {
+        Session session = sessionService.validateAdminRequest(request);
+
+        recyclingCenterDTO = recyclingCenterService.update(id, recyclingCenterDTO);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(EntityModel.of(recyclingCenterDTO));
+    }
 }

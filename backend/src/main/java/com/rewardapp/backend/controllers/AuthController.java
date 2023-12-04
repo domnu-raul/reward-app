@@ -59,6 +59,8 @@ public class AuthController {
         String password = requestBody.get("password");
 
         User user = userService.registerInternal(username, email, password);
+        EmailToken emailToken = emailTokenService.create(user.getId());
+        System.out.println(emailToken.getToken());
 //        emailSenderService.sendEmail("sir.c4ppuccin0@gmail.com", "test", "working");
 
         return ResponseEntity
@@ -66,9 +68,11 @@ public class AuthController {
                 .body(EntityModel.of(user));
     }
 
-    @PutMapping("/verify/{email_token}")
+    @PatchMapping("/verify/{email_token}")
     public ResponseEntity<EntityModel<User>> verifyEmail(@PathVariable("email_token") String token) {
-        EmailToken emailToken = emailTokenService.getByEmailToken(token);
+        EmailToken emailToken = emailTokenService.findEmailByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email token."));
+
         Long userId = emailToken.getUserId();
 
         User user = userService.setVerified(userId);
@@ -79,7 +83,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
         if (session == null)
             throw new RuntimeException("You are not logged in.");
@@ -87,5 +91,13 @@ public class AuthController {
         sessionService.logout(session.getSessionId());
 
         return null;
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping(HttpServletRequest request) {
+        Session session = sessionService.validateRequest(request);
+        return ResponseEntity
+                .status(session == null ? HttpStatus.UNAUTHORIZED : HttpStatus.ACCEPTED)
+                .body(session == null);
     }
 }

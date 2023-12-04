@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmailTokenRepository extends JpaRepository<EmailToken, Long> {
@@ -14,5 +15,5 @@ public interface EmailTokenRepository extends JpaRepository<EmailToken, Long> {
     @Transactional
     public List<EmailToken> removeEmailTokenByExpirationDateBefore(Timestamp timestamp);
 
-    public EmailToken getEmailTokenByToken(String token);
+    public Optional<EmailToken> findEmailTokenByToken(String token);
 }

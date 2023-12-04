@@ -28,7 +28,7 @@ public class SessionService {
         session.setUserId(user.getId());
         return sessionRepository.save(session);
     }
-    
+
     public Session validateRequest(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null)
@@ -39,23 +39,20 @@ public class SessionService {
                 .map(Cookie::getValue)
                 .findAny();
 
-        if (sessionIdOptional.isEmpty())
-            throw new RuntimeException("You must be logged in.");
+        String sessionId = sessionIdOptional
+                .orElseThrow(() -> new RuntimeException("You must be logged in."));
 
-        String sessionId = sessionIdOptional.get();
+        Session session = sessionRepository.findSessionBySessionId(sessionId)
+                .orElseThrow(() -> new RuntimeException("Invalid session."));
 
-        Optional<Session> optionalSession = sessionRepository.findSessionBySessionId(sessionId);
-        if (optionalSession.isEmpty())
-            throw new RuntimeException("Invalid session.");
-
-        return optionalSession.get();
+        return session;
     }
 
     public Session validateAdminRequest(HttpServletRequest request) {
         Session session = validateRequest(request);
         User user = userRepository.getUserById(session.getUserId());
 
-        if (user.getType() == User.UserType.ADMIN)
+        if (user.getType() == User.UserType.USER)
             throw new RuntimeException("Unauthorized.");
 
         return session;

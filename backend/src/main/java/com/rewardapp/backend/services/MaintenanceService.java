@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class MaintenanceService {
+    private static final Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
     private final EmailTokenRepository emailTokenRepository;
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
-    private static final Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
 
     private MaintenanceService(EmailTokenRepository emailTokenRepository, UserRepository userRepository, SessionRepository sessionRepository) {
         this.emailTokenRepository = emailTokenRepository;
@@ -30,6 +30,7 @@ public class MaintenanceService {
     }
 
     @Scheduled(cron = "0 0 0 * * MON-SUN")
+    @Scheduled(initialDelay = 1L)
     private void purgeUnverifiedUsers() {
         logger.info("Scheduler started task \"purgeUnverifiedUsers()\":");
 
@@ -42,10 +43,10 @@ public class MaintenanceService {
 
         List<User> users = userRepository
                 .deleteUsersByIdInAndVerified(emailTokens
-                        .stream()
-                        .map(x -> x.getUserId())
-                        .distinct()
-                        .collect(Collectors.toList()),
+                                .stream()
+                                .map(x -> x.getUserId())
+                                .distinct()
+                                .collect(Collectors.toList()),
                         false);
 
         logger.info(
