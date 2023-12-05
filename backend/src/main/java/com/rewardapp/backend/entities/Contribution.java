@@ -6,7 +6,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Table(name = "contributions")
 @Data
@@ -18,10 +17,10 @@ public class Contribution {
     private Long userId;
     @Column("recycling_center_id")
     private Long recyclingCenterId;
-    @Column(value = "id")
-    private Material material;
+    @Column("material_id")
+    private Long materialId;
     @Column("timestamp")
-    private Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+    private Timestamp timestamp;
     @Column("quantity")
     private Double quantity;
     @Column("measurment")
@@ -29,7 +28,7 @@ public class Contribution {
     @Column("reward")
     private Long reward;
 
-    private enum MeasurmentType {
+    public enum MeasurmentType {
         PIECE, KG;
     }
 }

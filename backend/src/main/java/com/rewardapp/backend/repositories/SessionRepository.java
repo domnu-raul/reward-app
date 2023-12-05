@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SessionRepository extends CrudRepository<Session, Integer> {
-    public Session getSessionById(Integer id);
+public interface SessionRepository extends CrudRepository<Session, Long> {
+    public Session getSessionById(Long id);
 
     public Optional<Session> findSessionBySessionId(String sessionId);
 

@@ -1,12 +1,17 @@
 package com.rewardapp.backend.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("recycling_centers_locations")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RecyclingCenterLocation {
     @Id
     @Column("recycling_center_id")
@@ -23,9 +28,6 @@ public class RecyclingCenterLocation {
     private Double longitude;
     @Column("latitude")
     private Double latitude;
-
-    //    @OneToOne
-//    @JoinColumn(name = "recycling_center_id")
-//    @MapsId
+    @Transient
     private RecyclingCenter recyclingCenter;
 }

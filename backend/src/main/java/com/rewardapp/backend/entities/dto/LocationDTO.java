@@ -1,4 +1,4 @@
-package com.rewardapp.backend.dto;
+package com.rewardapp.backend.entities.dto;
 
 public record LocationDTO(
         String county,
@@ -7,4 +7,5 @@ public record LocationDTO(
         String zipcode,
         Double longitude,
         Double latitude
-) {}
+) {
+}

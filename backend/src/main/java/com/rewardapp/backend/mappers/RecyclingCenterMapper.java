@@ -1,10 +1,10 @@
 package com.rewardapp.backend.mappers;
 
-import com.rewardapp.backend.dto.LocationDTO;
-import com.rewardapp.backend.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.entities.RecyclingCenter;
 import com.rewardapp.backend.entities.RecyclingCenterLocation;
 import com.rewardapp.backend.entities.RecyclingCenterMaterial;
+import com.rewardapp.backend.entities.dto.LocationDTO;
+import com.rewardapp.backend.entities.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.repositories.MaterialRepository;
 import org.springframework.stereotype.Service;
 

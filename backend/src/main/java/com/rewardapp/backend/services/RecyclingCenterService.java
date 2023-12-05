@@ -1,10 +1,10 @@
 package com.rewardapp.backend.services;
 
-import com.rewardapp.backend.dto.LocationDTO;
-import com.rewardapp.backend.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.entities.RecyclingCenter;
 import com.rewardapp.backend.entities.RecyclingCenterLocation;
 import com.rewardapp.backend.entities.RecyclingCenterMaterial;
+import com.rewardapp.backend.entities.dto.LocationDTO;
+import com.rewardapp.backend.entities.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.mappers.RecyclingCenterMapper;
 import com.rewardapp.backend.repositories.MaterialRepository;
 import com.rewardapp.backend.repositories.RecyclingCenterMaterialRepository;

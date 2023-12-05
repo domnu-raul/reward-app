@@ -1,8 +1,8 @@
 package com.rewardapp.backend.controllers;
 
-import com.rewardapp.backend.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.entities.RecyclingCenter;
 import com.rewardapp.backend.entities.Session;
+import com.rewardapp.backend.entities.dto.RecyclingCenterDTO;
 import com.rewardapp.backend.services.RecyclingCenterService;
 import com.rewardapp.backend.services.SessionService;
 import jakarta.servlet.http.HttpServletRequest;

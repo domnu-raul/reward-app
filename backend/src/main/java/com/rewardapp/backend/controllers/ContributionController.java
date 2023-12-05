@@ -1,8 +1,8 @@
 package com.rewardapp.backend.controllers;
 
+import com.rewardapp.backend.dao.ContributionDAO;
 import com.rewardapp.backend.entities.Contribution;
 import com.rewardapp.backend.entities.Session;
-import com.rewardapp.backend.repositories.ContributionRepository;
 import com.rewardapp.backend.services.SessionService;
 import com.rewardapp.backend.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,17 +21,18 @@ import java.util.List;
 @RequestMapping("/api/contributions")
 public class ContributionController {
     private final SessionService sessionService;
-    private final ContributionRepository contributionRepository;
-    public ContributionController(SessionService sessionService, UserService userService, ContributionRepository contributionRepository) {
+    private final ContributionDAO contributionDAO;
+
+    public ContributionController(SessionService sessionService, UserService userService, ContributionDAO contributionDAO) {
         this.sessionService = sessionService;
-        this.contributionRepository = contributionRepository;
+        this.contributionDAO = contributionDAO;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Contribution>> get(@PathVariable("id") Long id, HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
 
-        Contribution contribution = contributionRepository.getContributionByIdAndUserId(id, session.getUserId());
+        Contribution contribution = contributionDAO.getContributionById(id);
 
         EntityModel<Contribution> response = EntityModel.of(contribution);
 
@@ -42,9 +43,9 @@ public class ContributionController {
 
     @GetMapping("/all")
     public ResponseEntity<CollectionModel<Contribution>> getAll(HttpServletRequest request) {
-        Session session = sessionService.validateRequest(request);
+//        Session session = sessionService.validateRequest(request);
 
-        List<Contribution> contributions = contributionRepository.getAllByUserId(session.getUserId());
+        List<Contribution> contributions = contributionDAO.getContributionsByUserId(152L);
 
         CollectionModel<Contribution> response = CollectionModel.of(contributions);
 

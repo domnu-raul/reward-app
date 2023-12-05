@@ -3,6 +3,7 @@ package com.rewardapp.backend.controllers;
 import com.rewardapp.backend.entities.EmailToken;
 import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.entities.User;
+import com.rewardapp.backend.entities.dto.UserCredentials;
 import com.rewardapp.backend.services.EmailSenderService;
 import com.rewardapp.backend.services.EmailTokenService;
 import com.rewardapp.backend.services.SessionService;
@@ -14,8 +15,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/auth")
@@ -33,11 +32,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<EntityModel<Session>> login(@RequestBody Map<String, String> requestBody, HttpServletResponse httpResponse) {
-        String username = requestBody.get("username");
-        String password = requestBody.get("password");
-
-        User user = userService.validateInternal(username, password);
+    public ResponseEntity<EntityModel<Session>> login(@RequestBody UserCredentials credentials, HttpServletResponse httpResponse) {
+        User user = userService.validateInternal(credentials);
 
         Session session = sessionService.create(user);
 
@@ -53,12 +49,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<EntityModel<User>> register(@RequestBody Map<String, String> requestBody) {
-        String username = requestBody.get("username");
-        String email = requestBody.get("email");
-        String password = requestBody.get("password");
-
-        User user = userService.registerInternal(username, email, password);
+    public ResponseEntity<EntityModel<User>> register(@RequestBody UserCredentials credentials) {
+        User user = userService.registerInternal(credentials);
         EmailToken emailToken = emailTokenService.create(user.getId());
         System.out.println(emailToken.getToken());
 //        emailSenderService.sendEmail("sir.c4ppuccin0@gmail.com", "test", "working");

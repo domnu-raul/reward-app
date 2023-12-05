@@ -1,9 +1,9 @@
 package com.rewardapp.backend.services;
 
+import com.rewardapp.backend.dao.UserDAO;
 import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.repositories.SessionRepository;
-import com.rewardapp.backend.repositories.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
@@ -16,11 +16,11 @@ import java.util.Optional;
 @Transactional
 public class SessionService {
     private final SessionRepository sessionRepository;
-    private final UserRepository userRepository;
+    private final UserDAO userDAO;
 
-    public SessionService(SessionRepository sessionRepository, UserRepository userRepository) {
+    public SessionService(SessionRepository sessionRepository, UserDAO userDAO) {
         this.sessionRepository = sessionRepository;
-        this.userRepository = userRepository;
+        this.userDAO = userDAO;
     }
 
     public Session create(User user) {
@@ -50,7 +50,7 @@ public class SessionService {
 
     public Session validateAdminRequest(HttpServletRequest request) {
         Session session = validateRequest(request);
-        User user = userRepository.getUserById(session.getUserId());
+        User user = userDAO.getUserById(session.getUserId());
 
         if (user.getType() == User.UserType.USER)
             throw new RuntimeException("Unauthorized.");

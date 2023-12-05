@@ -1,15 +1,18 @@
 package com.rewardapp.backend.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Date;
-import java.time.LocalDate;
 
 @Table("users")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     @Column("id")
@@ -19,11 +22,11 @@ public class User {
     @Column("email")
     protected String email;
     @Column("verified")
-    protected Boolean verified = false;
+    protected Boolean verified;
     @Column("register_date")
-    protected Date register_date = Date.valueOf(LocalDate.now());
+    protected Date register_date;
     @Column("type")
-    protected UserType type = UserType.USER;
+    protected UserType type;
 
     public enum UserType {
         ADMIN, USER;
