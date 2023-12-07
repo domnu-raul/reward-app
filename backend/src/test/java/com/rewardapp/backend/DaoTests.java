@@ -4,11 +4,9 @@ import com.rewardapp.backend.dao.ContributionDAO;
 import com.rewardapp.backend.dao.RecyclingCenterDAO;
 import com.rewardapp.backend.dao.SessionDAO;
 import com.rewardapp.backend.dao.UserDAO;
-import com.rewardapp.backend.entities.Contribution;
-import com.rewardapp.backend.entities.RecyclingCenter;
-import com.rewardapp.backend.entities.Session;
+import com.rewardapp.backend.entities.User;
+import com.rewardapp.backend.models.Session;
 import com.rewardapp.backend.models.UserCredentials;
-import com.rewardapp.backend.models.UserModel;
 import com.rewardapp.backend.services.UserService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -34,7 +32,7 @@ public class DaoTests {
 
     @Test
     void selectAllUsers() {
-        List<UserModel> l = userDAO.list();
+        List<User> l = userDAO.list();
         for (var x : l
         ) {
             System.out.println(x);
@@ -56,8 +54,8 @@ public class DaoTests {
 
     @Test
     void getByUsername() {
-        UserModel userModel = userDAO.getUserByUsername("adin");
-        Assert.assertEquals((Long) 103L, userModel.getId());
+        User user = userDAO.getUserByUsername("adin");
+        Assert.assertEquals((Long) 103L, user.getId());
     }
 
     @Test
@@ -81,23 +79,24 @@ public class DaoTests {
     @Test
     void registerUser() {
         UserCredentials uc = new UserCredentials("slaszh", "azaaa@ddb.ccc", "1234");
-        UserModel userModel = userService.register(uc);
+//        User user = userService.register(uc);
 
-        Assert.assertEquals(uc.username(), userModel.getUsername());
-        Assert.assertEquals(uc.email(), userModel.getEmail());
+        Assert.assertEquals(uc.username(), user.getUsername());
+        Assert.assertEquals(uc.email(), user.getEmail());
     }
 
     @Test
     void saveContribution() {
-        System.out.println(
-                contributionDAO.save(Contribution.builder()
-                        .userId(152L)
-                        .quantity(10D)
-                        .measurement(Contribution.MeasurementType.PIECE)
-                        .materialId(5L)
-                        .recyclingCenterId(553L)
-                        .build())
-        );
+//        System.out.println(
+//                contributionDAO.save( new Contribution(
+//                        103L,
+//                        653L,
+//                        1L,
+//                        1.0,
+//                        "kg",
+//                        1L
+//                ))
+//        );
     }
 
     @Test

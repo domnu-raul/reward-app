@@ -1,4 +1,4 @@
-package com.rewardapp.backend.models;
+package com.rewardapp.backend.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,15 +9,16 @@ import java.sql.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserModel {
+public class User {
     protected Long id;
     protected String username;
     protected String email;
     protected Boolean verified;
-    protected Date register_date;
+    protected Date registerDate;
     protected UserType type;
 
     public enum UserType {
         ADMIN, USER;
+
     }
 }

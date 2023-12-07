@@ -24,6 +24,7 @@ dependencies {
     //i need WebMvcLinkBuilder
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.mindrot:jbcrypt:0.4'
+    implementation 'org.jetbrains:annotations:24.0.0'
     testImplementation 'junit:junit:4.13.1'
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

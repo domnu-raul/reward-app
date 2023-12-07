@@ -1,9 +1,8 @@
 package com.rewardapp.backend.services;
 
 import com.rewardapp.backend.dao.SessionDAO;
-import com.rewardapp.backend.dao.UserDAO;
-import com.rewardapp.backend.entities.Session;
-import com.rewardapp.backend.models.UserModel;
+import com.rewardapp.backend.entities.User;
+import com.rewardapp.backend.models.Session;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +18,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SessionService {
     private final SessionDAO sessionDAO;
-    private final UserDAO userDAO;
 
-    public Session create(UserModel userModel) {
-        Session session = Session.builder()
-                .userId(userModel.getId())
-                .sessionId(UUID.randomUUID().toString())
-                .build();
+    public Session create(User user) {
+        Session session = new Session();
+        session.setSessionId(UUID.randomUUID().toString());
+        session.setUserId(user.getId());
 
         return sessionDAO.save(session);
     }
@@ -43,19 +40,8 @@ public class SessionService {
         String sessionId = sessionIdOptional
                 .orElseThrow(() -> new RuntimeException("You must be logged in."));
 
-        Session session = sessionDAO.getSessionBySessionId(sessionId);
-
-        return session;
-    }
-
-    public Session validateAdminRequest(HttpServletRequest request) {
-        Session session = validateRequest(request);
-        UserModel userModel = userDAO.getUserById(session.getUserId());
-
-        if (userModel.getType() == UserModel.UserType.USER)
-            throw new RuntimeException("Unauthorized.");
-
-        return session;
+        return sessionDAO.findSessionBySessionId(sessionId)
+                .orElseThrow();
     }
 
     public void logout(Session session) {

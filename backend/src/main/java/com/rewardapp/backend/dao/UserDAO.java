@@ -1,6 +1,6 @@
 package com.rewardapp.backend.dao;
 
-import com.rewardapp.backend.models.UserModel;
+import com.rewardapp.backend.entities.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -17,13 +17,13 @@ import java.util.Map;
 
 @Component
 public class UserDAO {
-    private static final RowMapper<UserModel> rowMapper = (rs, rownum) -> new UserModel(
+    private static final RowMapper<User> rowMapper = (rs, rownum) -> new User(
             rs.getLong("id"),
             rs.getString("username"),
             rs.getString("email"),
             rs.getBoolean("verified"),
             rs.getDate("register_date"),
-            UserModel.UserType.valueOf(rs.getString("type"))
+            User.UserType.valueOf(rs.getString("type"))
     );
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -34,12 +34,12 @@ public class UserDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<UserModel> list() {
+    public List<User> list() {
         String sql = "SELECT * FROM users";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public UserModel setVerified(Long id) {
+    public User setVerified(Long id) {
         String sql = "UPDATE users SET verified = true WHERE id = ?";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -50,48 +50,48 @@ public class UserDAO {
         }, keyHolder);
 
         Map<String, Object> keys = keyHolder.getKeys();
-        UserModel userModel = new UserModel(
+        User user = new User(
                 (Long) keys.get("id"),
                 (String) keys.get("username"),
                 (String) keys.get("email"),
                 (Boolean) keys.get("verified"),
                 (Date) keys.get("register_date"),
-                (UserModel.UserType) keys.get("type")
+                User.UserType.valueOf((String) keys.get("type"))
         );
 
-        return userModel;
+        return user;
     }
 
-    public UserModel getUserById(Long id) {
+    public User getUserById(Long id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
-    public UserModel getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
         return jdbcTemplate.queryForObject(sql, rowMapper, username);
     }
 
-    public UserModel save(UserModel userModel) {
+    public User save(User user) {
         String sql = "INSERT INTO users (username, email) VALUES (?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, userModel.getUsername());
-            ps.setString(2, userModel.getEmail());
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
             return ps;
         }, keyHolder);
 
         Map<String, Object> keys = keyHolder.getKeys();
 
-        return new UserModel(
+        return new User(
                 (Long) keys.get("id"),
                 (String) keys.get("username"),
                 (String) keys.get("email"),
                 (Boolean) keys.get("verified"),
                 (Date) keys.get("register_date"),
-                (UserModel.UserType) keys.get("type")
+                User.UserType.valueOf((String) keys.get("type"))
         );
     }
 

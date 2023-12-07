@@ -15,16 +15,16 @@ import java.util.Map;
 
 @Component
 public class ContributionDAO {
-    private static final RowMapper<Contribution> rowMapper = (rs, rownum) -> Contribution.builder()
-            .id(rs.getLong("id"))
-            .userId(rs.getLong("user_id"))
-            .recyclingCenterId(rs.getLong("recycling_center_id"))
-            .materialId(rs.getLong("material_id"))
-            .timestamp(rs.getTimestamp("timestamp"))
-            .quantity(rs.getDouble("quantity"))
-            .measurement(Contribution.MeasurementType.valueOf(rs.getString("measurment")))
-            .reward(rs.getLong("reward"))
-            .build();
+    private static final RowMapper<Contribution> rowMapper = (rs, rownum) -> new Contribution(
+            rs.getLong("id"),
+            rs.getLong("user_id"),
+            rs.getLong("recycling_center_id"),
+            rs.getLong("material_id"),
+            rs.getTimestamp("timestamp"),
+            rs.getDouble("quantity"),
+            Contribution.MeasurementType.valueOf(rs.getString("measurment")),
+            rs.getLong("reward")
+    );
     private final JdbcTemplate jdbcTemplate;
 
     public ContributionDAO(JdbcTemplate jdbcTemplate) {
@@ -57,15 +57,15 @@ public class ContributionDAO {
 
         Map<String, Object> keys = keyHolder.getKeys();
 
-        return Contribution.builder()
-                .id((Long) keys.get("id"))
-                .userId((Long) keys.get("user_id"))
-                .recyclingCenterId((Long) keys.get("recycling_center_id"))
-                .materialId((Long) keys.get("material_id"))
-                .timestamp((Timestamp) keys.get("timestamp"))
-                .quantity((Double) keys.get("quantity"))
-                .measurement(Contribution.MeasurementType.valueOf((String) keys.get("measurment")))
-                .reward((Long) keys.get("reward"))
-                .build();
+        return new Contribution(
+                (Long) keys.get("id"),
+                contribution.getUserId(),
+                contribution.getRecyclingCenterId(),
+                contribution.getMaterialId(),
+                new Timestamp(System.currentTimeMillis()),
+                contribution.getQuantity(),
+                contribution.getMeasurement(),
+                contribution.getReward()
+        );
     }
 }

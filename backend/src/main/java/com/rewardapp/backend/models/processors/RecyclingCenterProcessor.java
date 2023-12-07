@@ -1,7 +1,7 @@
 package com.rewardapp.backend.models.processors;
 
 import com.rewardapp.backend.controllers.RecyclingCenterController;
-import com.rewardapp.backend.models.RecyclingCenterModel;
+import com.rewardapp.backend.models.RecyclingCenter;
 import org.springframework.hateoas.server.RepresentationModelProcessor;
 import org.springframework.stereotype.Component;
 
@@ -10,15 +10,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 
 @Component
-public class RecyclingCenterModelProcessor implements RepresentationModelProcessor<RecyclingCenterModel> {
+public class RecyclingCenterProcessor implements RepresentationModelProcessor<RecyclingCenter> {
     @Override
-    public RecyclingCenterModel process(RecyclingCenterModel model) {
-        model.add(
+    public RecyclingCenter process(RecyclingCenter model) {
+        return model.add(
                 linkTo(methodOn(RecyclingCenterController.class).get(model.getId(), null))
                         .withSelfRel(),
                 linkTo(methodOn(RecyclingCenterController.class).getAll(null))
                         .withRel("all")
         );
-        return model;
     }
 }

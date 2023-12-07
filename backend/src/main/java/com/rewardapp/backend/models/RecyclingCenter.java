@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecyclingCenterModel extends RepresentationModel<RecyclingCenterModel> {
+public class RecyclingCenter extends RepresentationModel<RecyclingCenter> {
     private Long id;
     private String name;
     private List<String> materials;

@@ -1,16 +1,21 @@
 package com.rewardapp.backend.services;
 
 import com.rewardapp.backend.entities.EmailToken;
-import com.rewardapp.backend.entities.Session;
+import com.rewardapp.backend.entities.User;
+import com.rewardapp.backend.models.Session;
 import com.rewardapp.backend.models.UserCredentials;
 import com.rewardapp.backend.models.UserModel;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthService {
     private final UserService userService;
@@ -18,9 +23,15 @@ public class AuthService {
     private final EmailSenderService emailSenderService;
     private final EmailTokenService emailTokenService;
 
-    public Session login(UserCredentials userCredentials) {
-        UserModel userModel = userService.validate(userCredentials);
-        Session session = sessionService.create(userModel);
+    public Session login(UserCredentials userCredentials, HttpServletResponse httpResponse) {
+        User user = userService.validate(userCredentials);
+        Session session = sessionService.create(user);
+
+        Cookie cookie = new Cookie("session_id", session.getSessionId());
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        httpResponse.addCookie(cookie);
 
         return session;
     }
@@ -29,24 +40,32 @@ public class AuthService {
         return sessionService.validateRequest(request);
     }
 
+    public Session validateAdminRequest(HttpServletRequest request) {
+        Session session = sessionService.validateRequest(request);
+        UserModel user = userService.getUserById(session.getUserId());
+        if (!Objects.equals(user.getType(), User.UserType.ADMIN.toString())) {
+            throw new RuntimeException("You must be an admin to perform this action.");
+        }
+        return session;
+    }
+
     public UserModel register(UserCredentials userCredentials) {
-        UserModel userModel = userService.register(userCredentials);
+        UserModel user = userService.register(userCredentials);
 //        emailSenderService.sendEmail(user.getEmail(), "Verify your email", "http://localhost:8080/api/auth/verify/" + emailTokenService.create(user.getId()).getToken());
 
-        return userModel;
+        return user;
     }
 
     //todo: create a model for the oauth request body
-    public UserModel registerOAuth(UserCredentials userCredentials) {
+    public User registerOAuth(UserCredentials userCredentials) {
         return null;
     }
 
     public UserModel verifyEmail(String token) {
-        Optional<EmailToken> emailToken = emailTokenService.findEmailByToken(token);
-        if (emailToken.isEmpty())
-            throw new RuntimeException("Invalid token.");
+        EmailToken emailToken = emailTokenService.findEmailByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token."));
 
-        return userService.setVerified(emailToken.get().getUserId());
+        return userService.setVerified(emailToken.getUserId());
     }
 
     public UserModel getUser(Session session) {
@@ -59,19 +78,19 @@ public class AuthService {
 
     }
 
-    public void logoutAll(UserModel userModel) {
+    public void logoutAll(User user) {
 //        sessionService.logoutAll(user);
     }
 
-    public UserModel changePassword(UserModel userModel, String newPassword) {
+    public UserModel changePassword(User user, String newPassword) {
         return null;
     }
 
-    public UserModel changeEmail(UserModel userModel, String newEmail) {
+    public UserModel changeEmail(User user, String newEmail) {
         return null;
     }
 
-    public UserModel changeUsername(UserModel userModel, String newUsername) {
+    public UserModel changeUsername(User user, String newUsername) {
         return null;
     }
 }

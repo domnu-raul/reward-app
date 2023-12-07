@@ -1,10 +1,10 @@
 package com.rewardapp.backend.controllers;
 
 import com.rewardapp.backend.dao.ContributionDAO;
-import com.rewardapp.backend.dao.ContributionModelDAO;
+import com.rewardapp.backend.dao.ContributionDetailsDAO;
 import com.rewardapp.backend.entities.Contribution;
-import com.rewardapp.backend.entities.Session;
-import com.rewardapp.backend.models.ContributionModel;
+import com.rewardapp.backend.models.ContributionDetails;
+import com.rewardapp.backend.models.Session;
 import com.rewardapp.backend.services.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ContributionController {
     private final SessionService sessionService;
     private final ContributionDAO contributionDAO;
-    private final ContributionModelDAO contributionModelDAO;
+    private final ContributionDetailsDAO contributionDetailsDAO;
 
     //todo: make DTO for Contribution extending RepresentationModel
     //todo: add links to user and recycling center
@@ -36,11 +36,12 @@ public class ContributionController {
     //todo: add link to all contributions
     //todo: make detailed DTO for Contribution with a DAO method that returns it
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ContributionModel>> get(@PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<EntityModel<ContributionDetails>> get(@PathVariable("id") Long id, HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
 
-        ContributionModel contribution = contributionModelDAO.getContributionDetails(id);
-        EntityModel<ContributionModel> response = EntityModel.of(contribution);
+        ContributionDetails contribution = contributionDetailsDAO.getContributionDetails(id).orElseThrow();
+
+        EntityModel<ContributionDetails> response = EntityModel.of(contribution);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

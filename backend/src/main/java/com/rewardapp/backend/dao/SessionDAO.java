@@ -1,6 +1,6 @@
 package com.rewardapp.backend.dao;
 
-import com.rewardapp.backend.entities.Session;
+import com.rewardapp.backend.models.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -8,22 +8,20 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class SessionDAO {
-    private static final RowMapper<Session> rowMapper = (rs, rowNum) -> {
-        return Session.builder()
-                .id(rs.getLong("id"))
-                .sessionId(rs.getString("session_id"))
-                .expirationDate(rs.getDate("expiration_date"))
-                .userId(rs.getLong("user_id"))
-                .build();
-    };
+    private static final RowMapper<Session> rowMapper = (rs, rowNum) -> new Session(
+            rs.getLong("id"),
+            rs.getString("session_id"),
+            rs.getDate("expiration_date"),
+            rs.getLong("user_id")
+    );
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -32,14 +30,18 @@ public class SessionDAO {
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
-    public Session getSessionBySessionId(String sessionId) {
+    public Optional<Session> findSessionBySessionId(String sessionId) {
         String sql = "SELECT * FROM sessions WHERE session_id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, sessionId);
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sql, rowMapper, sessionId));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     public void removeSessionBySessionId(String sessionId) {
-        String sql = "DELETE FROM sessions WHERE session_id = ?";
-        jdbcTemplate.update(sql, rowMapper, sessionId);
+        String sql = "DELETE FROM sessions WHERE session_id LIKE ?";
+        jdbcTemplate.update(sql, sessionId);
     }
 
     public Integer removeExpiredSessions() {
@@ -61,11 +63,11 @@ public class SessionDAO {
 
         Map<String, Object> keys = keyHolder.getKeys();
 
-        return Session.builder()
-                .userId((Long) keys.get("user_id"))
-                .sessionId((String) keys.get("session_id"))
-                .expirationDate((Date) keys.get("expiration_date"))
-                .id((Long) keys.get("id"))
-                .build();
+        return new Session(
+                (Long) keys.get("id"),
+                session.getSessionId(),
+                session.getExpirationDate(),
+                session.getUserId()
+        );
     }
 }

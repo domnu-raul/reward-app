@@ -3,11 +3,8 @@ package com.rewardapp.backend.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rewardapp.backend.dao.RecyclingCenterDAO;
-import com.rewardapp.backend.entities.RecyclingCenter;
 import com.rewardapp.backend.models.LocationModel;
-import com.rewardapp.backend.models.RecyclingCenterModel;
-import com.rewardapp.backend.models.assemblers.RecyclingCenterModelAssembler;
-import com.rewardapp.backend.models.processors.RecyclingCenterModelProcessor;
+import com.rewardapp.backend.models.RecyclingCenter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,8 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecyclingCenterService {
     private final RecyclingCenterDAO recyclingCenterDAO;
-    private final RecyclingCenterModelAssembler recyclingCenterModelAssembler;
-    private final RecyclingCenterModelProcessor recyclingCenterModelProcessor;
 
     private static Double[] getCoordinates(LocationModel locationModel) {
         String address = locationModel.getAddress() + ", " + locationModel.getCity() + ", " + locationModel.getCounty() + ", " + locationModel.getZipcode();
@@ -50,8 +45,8 @@ public class RecyclingCenterService {
         return new Double[]{lat, lng};
     }
 
-    public RecyclingCenterModel create(RecyclingCenterModel recyclingCenterModel) {
-        LocationModel locationModel = recyclingCenterModel.getLocation();
+    public RecyclingCenter create(RecyclingCenter recyclingCenter) {
+        LocationModel locationModel = recyclingCenter.getLocation();
 
         if (locationModel.getLatitude() == null || locationModel.getLongitude() == null) {
             Double[] coordinates = getCoordinates(locationModel);
@@ -59,24 +54,19 @@ public class RecyclingCenterService {
             locationModel.setLatitude(coordinates[0]);
         }
 
-        RecyclingCenter recyclingCenter = recyclingCenterDAO.save(recyclingCenterModel);
-        RecyclingCenterModel model = recyclingCenterModelAssembler.toModel(recyclingCenter);
-        return recyclingCenterModelProcessor.process(model);
+        return recyclingCenterDAO.save(recyclingCenter);
     }
 
-    public RecyclingCenterModel findRecyclingCenterById(Long id) {
-        RecyclingCenter recyclingCenter = recyclingCenterDAO.getRecyclingCenterById(id);
-
-        RecyclingCenterModel recyclingCenterModel = recyclingCenterModelAssembler.toModel(recyclingCenter);
-        return recyclingCenterModelProcessor.process(recyclingCenterModel);
+    public RecyclingCenter findRecyclingCenterById(Long id) {
+        return recyclingCenterDAO.getRecyclingCenterById(id);
     }
 
     public Boolean deleteById(Long id) {
         return recyclingCenterDAO.deleteById(id);
     }
 
-    public RecyclingCenterModel update(Long id, RecyclingCenterModel recyclingCenterModel) {
-        LocationModel locationModel = recyclingCenterModel.getLocation();
+    public RecyclingCenter update(Long id, RecyclingCenter recyclingCenter) {
+        LocationModel locationModel = recyclingCenter.getLocation();
 
         if (locationModel.getLatitude() == null || locationModel.getLongitude() == null) {
             Double[] coordinates = getCoordinates(locationModel);
@@ -84,16 +74,10 @@ public class RecyclingCenterService {
             locationModel.setLatitude(coordinates[0]);
         }
 
-        RecyclingCenter updatedRecyclingCenter = recyclingCenterDAO.update(id, recyclingCenterModel);
-        RecyclingCenterModel model = recyclingCenterModelAssembler.toModel(updatedRecyclingCenter);
-        return recyclingCenterModelProcessor.process(model);
+        return recyclingCenterDAO.update(id, recyclingCenter);
     }
 
-    public List<RecyclingCenterModel> getAll() {
-        return recyclingCenterDAO.getAll()
-                .stream()
-                .map(recyclingCenterModelAssembler::toModel)
-                .map(recyclingCenterModelProcessor::process)
-                .toList();
+    public List<RecyclingCenter> getAll() {
+        return recyclingCenterDAO.getAll();
     }
 }
