@@ -1,11 +1,16 @@
 DONE: Enforce measurments and material types into contributions.
 DONE: Add reward system(maybe a trigger) to contributions.
-DONE: SQL View to find the reward points of the user, the impact they had, and the money they earned.
+DONE: SQL View to find the reward points of the userModel, the impact they had, and the money they earned.
 DONE: Add PurchaseOptions table.
 DONE: Add Vouchers table.
 DONE: Add Purchases table.
 Add GoogleUsers.
-Refactor to JDBC? Search which is better.
+
+implement:
+    DAO's for Purchases, Vouchers
+    DAO for a detailed userModel view(latest purchases, active vouchers, statistics)
+    Multiple search functions + pagination + search by nearest
+    // Google API coordinates.
 
 Mappers and DTO:
     Contribution
@@ -39,7 +44,7 @@ FRONT-END FUNCTIONALITIES:
     - Login page:
         Simple validation.
 
-    - Home page(user):
+    - Home page(userModel):
         "Recycling Centers" section(table view)
             COLUMNS: Name, Location, type(s) of material, operating hours.
             Initially sorted alphabetically.
@@ -55,7 +60,7 @@ FRONT-END FUNCTIONALITIES:
             RESET button, resets filters, sorts, and searches.
 
             Sort
-                by recyclingCenterLocation
+                by rcLocation
                 by name
                 by type accepted
             No sort button, use the columns.
@@ -68,11 +73,11 @@ FRONT-END FUNCTIONALITIES:
             Material type(dropdown, searchable) only including the types
             of materials accepeted by that center
             Amount(in kg, piece, dkg, g) with numbers-only validation.
-            CONTRIBUTE btn, will update the user's progress in real time.
+            CONTRIBUTE btn, will update the userModel's progress in real time.
 
     - Dashboard page(Admin):
         Add new center:
-            recyclingCenterLocation(map, searchable, enforce proper recyclingCenterLocation data and geocoding)
+            rcLocation(map, searchable, enforce proper rcLocation data and geocoding)
             materials(dropdown, searchable)
             name(text-field)
             working hours(2 time selectors)
@@ -122,9 +127,9 @@ BACKEND STRUCTURE:
         everyone
         AuthController
             uses the UserService to validate login data and to create new users.
-            uses the SessionService to create a new session for a user and return it.
-            uses the EmailTokenService to create a new email token, and also to validate the user with it.
-            uses the EmailSenderService to send an email to the user for validation.
+            uses the SessionService to create a new session for a userModel and return it.
+            uses the EmailTokenService to create a new email token, and also to validate the userModel with it.
+            uses the EmailSenderService to send an email to the userModel for validation.
             PATHS:
                 api/auth/login POST
                 api/auth/logout POST
@@ -146,7 +151,7 @@ BACKEND STRUCTURE:
 
         VoucherController
             uses the SessionServiImplement proper validation and potentially integrate with backend validation.
-ce and the UserService to get user specific data
+ce and the UserService to get userModel specific data
             PATHS:
                 users
                 api/vouchers/all GET
@@ -154,7 +159,7 @@ ce and the UserService to get user specific data
                 api/vouchers/buy POST
 
         ContributionsController
-            uses the SessionService and the UserService to get user specific data
+            uses the SessionService and the UserService to get userModel specific data
             PATHS:
                 users
                 api/contributions/all GET

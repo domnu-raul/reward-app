@@ -1,5 +1,6 @@
 package com.rewardapp.backend.entities;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Table("email_tokens")
 @Data
+@Builder
 public class EmailToken {
     @Id
     @Column("id")

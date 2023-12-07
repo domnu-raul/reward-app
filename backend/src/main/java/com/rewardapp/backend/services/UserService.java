@@ -3,8 +3,9 @@ package com.rewardapp.backend.services;
 import com.rewardapp.backend.dao.InternalUserDAO;
 import com.rewardapp.backend.dao.UserDAO;
 import com.rewardapp.backend.entities.InternalUser;
-import com.rewardapp.backend.entities.User;
-import com.rewardapp.backend.entities.dto.UserCredentials;
+import com.rewardapp.backend.models.UserCredentials;
+import com.rewardapp.backend.models.UserModel;
+import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,27 +14,22 @@ import java.util.regex.Pattern;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService {
     private final UserDAO userDAO;
     private final InternalUserDAO internalUserDAO;
 
-    public UserService(UserDAO userDAO, InternalUserDAO internalUserDAO) {
-        this.userDAO = userDAO;
-        this.internalUserDAO = internalUserDAO;
-    }
-
-    public User validateInternal(UserCredentials credentials) {
-        User user = userDAO.getUserByUsername(credentials.username());
-        InternalUser internalUser = internalUserDAO.getInternalUserById(user.getId());
+    public UserModel validate(UserCredentials credentials) {
+        UserModel userModel = userDAO.getUserByUsername(credentials.username());
+        InternalUser internalUser = internalUserDAO.getInternalUserById(userModel.getId());
 
         if (BCrypt.checkpw(credentials.password(), internalUser.getPassword()))
-            return user;
-
-        throw new RuntimeException("Incorrect password.");
-
+            return userModel;
+        else
+            throw new RuntimeException("Incorrect password.");
     }
 
-    public User registerInternal(UserCredentials credentials) {
+    public UserModel register(UserCredentials credentials) {
         Pattern email_validation = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 
         if (!email_validation.matcher(credentials.email()).matches())
@@ -42,33 +38,32 @@ public class UserService {
         String salt = BCrypt.gensalt();
         String hashed_password = BCrypt.hashpw(credentials.password(), salt);
 
-        User user = new User();
+        UserModel userModel = new UserModel();
+        userModel.setUsername(credentials.username());
+        userModel.setEmail(credentials.email());
 
-        user.setUsername(credentials.username());
-        user.setEmail(credentials.email());
+        userModel = userDAO.save(userModel);
 
-        userDAO.save(user);
-        user = userDAO.getUserByUsername(credentials.username());
+        InternalUser internalUser = InternalUser.builder()
+                .id(userModel.getId())
+                .password(hashed_password)
+                .build();
 
-        InternalUser internalUser = new InternalUser();
-
-        internalUser.setId(user.getId());
-        internalUser.setPassword(hashed_password);
         internalUserDAO.save(internalUser);
 
-        return user;
+        return userModel;
     }
 
-    public User setVerified(Long userId) {
+    public UserModel setVerified(Long userId) {
         userDAO.setVerified(userId);
         return userDAO.getUserById(userId);
     }
 
-    public User getUserByUsername(String username) {
+    public UserModel getUserByUsername(String username) {
         return this.userDAO.getUserByUsername(username);
     }
 
-    public User getUserById(Long id) {
+    public UserModel getUserById(Long id) {
         return this.userDAO.getUserById(id);
     }
 }

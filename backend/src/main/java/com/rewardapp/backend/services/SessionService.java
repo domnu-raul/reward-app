@@ -1,32 +1,33 @@
 package com.rewardapp.backend.services;
 
+import com.rewardapp.backend.dao.SessionDAO;
 import com.rewardapp.backend.dao.UserDAO;
 import com.rewardapp.backend.entities.Session;
-import com.rewardapp.backend.entities.User;
-import com.rewardapp.backend.repositories.SessionRepository;
+import com.rewardapp.backend.models.UserModel;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class SessionService {
-    private final SessionRepository sessionRepository;
+    private final SessionDAO sessionDAO;
     private final UserDAO userDAO;
 
-    public SessionService(SessionRepository sessionRepository, UserDAO userDAO) {
-        this.sessionRepository = sessionRepository;
-        this.userDAO = userDAO;
-    }
+    public Session create(UserModel userModel) {
+        Session session = Session.builder()
+                .userId(userModel.getId())
+                .sessionId(UUID.randomUUID().toString())
+                .build();
 
-    public Session create(User user) {
-        Session session = new Session();
-        session.setUserId(user.getId());
-        return sessionRepository.save(session);
+        return sessionDAO.save(session);
     }
 
     public Session validateRequest(HttpServletRequest request) {
@@ -42,23 +43,22 @@ public class SessionService {
         String sessionId = sessionIdOptional
                 .orElseThrow(() -> new RuntimeException("You must be logged in."));
 
-        Session session = sessionRepository.findSessionBySessionId(sessionId)
-                .orElseThrow(() -> new RuntimeException("Invalid session."));
+        Session session = sessionDAO.getSessionBySessionId(sessionId);
 
         return session;
     }
 
     public Session validateAdminRequest(HttpServletRequest request) {
         Session session = validateRequest(request);
-        User user = userDAO.getUserById(session.getUserId());
+        UserModel userModel = userDAO.getUserById(session.getUserId());
 
-        if (user.getType() == User.UserType.USER)
+        if (userModel.getType() == UserModel.UserType.USER)
             throw new RuntimeException("Unauthorized.");
 
         return session;
     }
 
-    public void logout(String sessionId) {
-        sessionRepository.removeSessionBySessionId(sessionId);
+    public void logout(Session session) {
+        sessionDAO.removeSessionBySessionId(session.getSessionId());
     }
 }

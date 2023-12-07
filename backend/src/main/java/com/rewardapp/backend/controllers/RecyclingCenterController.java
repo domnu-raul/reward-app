@@ -1,13 +1,15 @@
 package com.rewardapp.backend.controllers;
 
-import com.rewardapp.backend.entities.RecyclingCenter;
 import com.rewardapp.backend.entities.Session;
-import com.rewardapp.backend.entities.dto.RecyclingCenterDTO;
+import com.rewardapp.backend.models.RecyclingCenterModel;
 import com.rewardapp.backend.services.RecyclingCenterService;
 import com.rewardapp.backend.services.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,67 +18,66 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/recycling-centers")
+@RequiredArgsConstructor
 public class RecyclingCenterController {
     private final RecyclingCenterService recyclingCenterService;
     private final SessionService sessionService;
 
-    public RecyclingCenterController(RecyclingCenterService recyclingCenterService, SessionService sessionService) {
-        this.recyclingCenterService = recyclingCenterService;
-        this.sessionService = sessionService;
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<RecyclingCenterDTO>> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+    public ResponseEntity<RepresentationModel> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
-
-        RecyclingCenterDTO recyclingCenterDTO = recyclingCenterService.getRecyclingCenterDTOById(id);
+        RecyclingCenterModel model = recyclingCenterService.findRecyclingCenterById(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(EntityModel.of(recyclingCenterDTO));
+                .body(EntityModel.of(model));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<CollectionModel<RecyclingCenterDTO>> getAll(HttpServletRequest request) {
+    public ResponseEntity<CollectionModel> getAll(HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
 
-        List<RecyclingCenterDTO> recyclingCenters = recyclingCenterService.getAll();
+        List<RecyclingCenterModel> recyclingCenters = recyclingCenterService.getAll();
+
+        CollectionModel<EntityModel<RecyclingCenterModel>> collectionModel = CollectionModel.wrap(recyclingCenters);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CollectionModel.of(recyclingCenters));
+                .body(collectionModel);
     }
 
-    @PostMapping()
-    public ResponseEntity<EntityModel<RecyclingCenterDTO>> create(@RequestBody RecyclingCenterDTO recyclingCenterDTO, HttpServletRequest request) {
+    @PostMapping
+    public ResponseEntity<RepresentationModel> create(@RequestBody RecyclingCenterModel recyclingCenterModel, HttpServletRequest request) {
         Session session = sessionService.validateAdminRequest(request);
 
-        recyclingCenterDTO = recyclingCenterService.create(recyclingCenterDTO);
+        recyclingCenterModel = recyclingCenterService.create(recyclingCenterModel);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(EntityModel.of(recyclingCenterDTO));
+                .body(recyclingCenterModel);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<HttpEntity<Boolean>> delete(@PathVariable("id") Long id, HttpServletRequest request) {
         Session session = sessionService.validateAdminRequest(request);
 
-        RecyclingCenter recyclingCenter = recyclingCenterService.getRecyclingCenterById(id);
+        Boolean status = recyclingCenterService.deleteById(id);
+        HttpEntity<Boolean> httpEntity = new HttpEntity<>(status);
 
-        recyclingCenterService.delete(recyclingCenter);
-
-        return null;
+        return ResponseEntity
+                .status(status ? HttpStatus.OK : HttpStatus.CONFLICT)
+                .body(httpEntity);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<RecyclingCenterDTO>> update(@PathVariable("id") Long id, @RequestBody RecyclingCenterDTO recyclingCenterDTO, HttpServletRequest request) {
+    public ResponseEntity<RepresentationModel> update(@PathVariable("id") Long id, @RequestBody RecyclingCenterModel recyclingCenterModel, HttpServletRequest request) {
         Session session = sessionService.validateAdminRequest(request);
 
-        recyclingCenterDTO = recyclingCenterService.update(id, recyclingCenterDTO);
+        recyclingCenterModel = recyclingCenterService.update(id, recyclingCenterModel);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(EntityModel.of(recyclingCenterDTO));
+                .body(EntityModel.of(recyclingCenterModel));
     }
 }

@@ -1,123 +1,99 @@
 package com.rewardapp.backend.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rewardapp.backend.dao.RecyclingCenterDAO;
 import com.rewardapp.backend.entities.RecyclingCenter;
-import com.rewardapp.backend.entities.RecyclingCenterLocation;
-import com.rewardapp.backend.entities.RecyclingCenterMaterial;
-import com.rewardapp.backend.entities.dto.LocationDTO;
-import com.rewardapp.backend.entities.dto.RecyclingCenterDTO;
-import com.rewardapp.backend.mappers.RecyclingCenterMapper;
-import com.rewardapp.backend.repositories.MaterialRepository;
-import com.rewardapp.backend.repositories.RecyclingCenterMaterialRepository;
-import com.rewardapp.backend.repositories.RecyclingCenterRepository;
+import com.rewardapp.backend.models.LocationModel;
+import com.rewardapp.backend.models.RecyclingCenterModel;
+import com.rewardapp.backend.models.assemblers.RecyclingCenterModelAssembler;
+import com.rewardapp.backend.models.processors.RecyclingCenterModelProcessor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class RecyclingCenterService {
-    private final RecyclingCenterRepository recyclingCenterRepository;
-    private final MaterialRepository materialRepository;
-    private final RecyclingCenterMaterialRepository recyclingCenterMaterialRepository;
-    private final RecyclingCenterMapper recyclingCenterMapper;
+    private final RecyclingCenterDAO recyclingCenterDAO;
+    private final RecyclingCenterModelAssembler recyclingCenterModelAssembler;
+    private final RecyclingCenterModelProcessor recyclingCenterModelProcessor;
 
-    public RecyclingCenterService(RecyclingCenterRepository recyclingCenterRepository, MaterialRepository materialRepository, RecyclingCenterMaterialRepository recyclingCenterMaterialRepository, RecyclingCenterMapper recyclingCenterMapper) {
-        this.recyclingCenterRepository = recyclingCenterRepository;
-        this.materialRepository = materialRepository;
-        this.recyclingCenterMaterialRepository = recyclingCenterMaterialRepository;
-        this.recyclingCenterMapper = recyclingCenterMapper;
-    }
+    private static Double[] getCoordinates(LocationModel locationModel) {
+        String address = locationModel.getAddress() + ", " + locationModel.getCity() + ", " + locationModel.getCounty() + ", " + locationModel.getZipcode();
+        address = address.replace(" ", "+");
+        address = address.replace(",", "%2C");
+        String GOOGLE_API_KEY = "AIzaSyDmV5M3u4CcccC-VFtqDMLtzvpiOTw0lE0";
+        String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s", address, GOOGLE_API_KEY);
 
-    public RecyclingCenterDTO create(RecyclingCenterDTO recyclingCenterDTO) {
-        RecyclingCenter recyclingCenter = recyclingCenterMapper.mapToEntity(recyclingCenterDTO);
-        return recyclingCenterMapper.mapToDTO(recyclingCenterRepository.save(recyclingCenter));
-    }
-
-    public RecyclingCenterDTO getRecyclingCenterDTOById(Long id) {
-        RecyclingCenter recyclingCenter = getRecyclingCenterById(id);
-        return recyclingCenterMapper.mapToDTO(recyclingCenter);
-    }
-
-    public RecyclingCenter getRecyclingCenterById(Long id) {
-        return recyclingCenterRepository.getRecyclingCenterById(id);
-    }
-
-    public void delete(RecyclingCenter recyclingCenter) {
-        recyclingCenterRepository.delete(recyclingCenter);
-    }
-
-    public RecyclingCenterDTO update(Long id, RecyclingCenterDTO recyclingCenterDTO) {
-        RecyclingCenter recyclingCenter = recyclingCenterRepository.getRecyclingCenterById(id);
-
-        if (recyclingCenterDTO.name() != null)
-            recyclingCenter.setName(recyclingCenterDTO.name());
-        if (recyclingCenterDTO.startingTime() != null)
-            recyclingCenter.setStartingTime(recyclingCenterDTO.startingTime());
-        if (recyclingCenterDTO.endTime() != null)
-            recyclingCenter.setEndTime(recyclingCenterDTO.endTime());
-
-        recyclingCenterRepository.save(recyclingCenter);
-
-        if (recyclingCenterDTO.materials() != null) {
-            List<String> materialNames = recyclingCenterDTO.materials();
-
-            List<RecyclingCenterMaterial> currentMaterials = recyclingCenter.getRecyclingCenterMaterials();
-            List<RecyclingCenterMaterial> removed = currentMaterials
-                    .stream()
-                    .filter(recyclingCenterMaterial -> (!materialNames.contains(recyclingCenterMaterial.getMaterial().getName())))
-                    .peek(x -> System.out.println(x.getId() + " " + x.getMaterial().getName()))
-                    .toList();
-
-            List<RecyclingCenterMaterial> additions = materialNames
-                    .stream()
-                    .filter(name -> (!currentMaterials.stream().map(x -> x.getMaterial().getName()).toList().contains(name)))
-                    .map(name -> (materialRepository.findMaterialByName(name)
-                            .orElseThrow(() -> new RuntimeException("Material not found"))))
-                    .map(material -> {
-                        RecyclingCenterMaterial recyclingCenterMaterial = new RecyclingCenterMaterial();
-                        recyclingCenterMaterial.setRecyclingCenter(recyclingCenter);
-                        recyclingCenterMaterial.setMaterial(material);
-                        return recyclingCenterMaterial;
-                    })
-                    .toList();
-
-            currentMaterials.removeAll(removed);
-            currentMaterials.addAll(additions);
-
-            recyclingCenterMaterialRepository.deleteAll(removed);
-            recyclingCenterMaterialRepository.saveAll(additions);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(responseEntity.getBody());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        if (recyclingCenterDTO.location() != null) {
-            RecyclingCenterLocation location = recyclingCenter.getRecyclingCenterLocation();
-            LocationDTO newLocationDTO = recyclingCenterDTO.location();
+        JsonNode location = root.path("results").get(0).path("geometry").path("location");
+        Double lng = location.path("lng").asDouble();
+        Double lat = location.path("lat").asDouble();
 
-            if (newLocationDTO.address() != null)
-                location.setAddress(newLocationDTO.address());
-            if (newLocationDTO.city() != null)
-                location.setCity(newLocationDTO.city());
-            if (newLocationDTO.county() != null)
-                location.setCounty(newLocationDTO.county());
-            if (newLocationDTO.zipcode() != null)
-                location.setZipcode(newLocationDTO.zipcode());
-            if (newLocationDTO.latitude() != null)
-                location.setLatitude(newLocationDTO.latitude());
-            if (newLocationDTO.longitude() != null)
-                location.setLongitude(newLocationDTO.longitude());
+        System.out.println(lat);
 
-            recyclingCenterRepository.updateLocation(recyclingCenter);
-        }
-
-        return recyclingCenterMapper.mapToDTO(recyclingCenter);
+        return new Double[]{lat, lng};
     }
 
-    public List<RecyclingCenterDTO> getAll() {
-        return recyclingCenterRepository
-                .getAll()
+    public RecyclingCenterModel create(RecyclingCenterModel recyclingCenterModel) {
+        LocationModel locationModel = recyclingCenterModel.getLocation();
+
+        if (locationModel.getLatitude() == null || locationModel.getLongitude() == null) {
+            Double[] coordinates = getCoordinates(locationModel);
+            locationModel.setLongitude(coordinates[1]);
+            locationModel.setLatitude(coordinates[0]);
+        }
+
+        RecyclingCenter recyclingCenter = recyclingCenterDAO.save(recyclingCenterModel);
+        RecyclingCenterModel model = recyclingCenterModelAssembler.toModel(recyclingCenter);
+        return recyclingCenterModelProcessor.process(model);
+    }
+
+    public RecyclingCenterModel findRecyclingCenterById(Long id) {
+        RecyclingCenter recyclingCenter = recyclingCenterDAO.getRecyclingCenterById(id);
+
+        RecyclingCenterModel recyclingCenterModel = recyclingCenterModelAssembler.toModel(recyclingCenter);
+        return recyclingCenterModelProcessor.process(recyclingCenterModel);
+    }
+
+    public Boolean deleteById(Long id) {
+        return recyclingCenterDAO.deleteById(id);
+    }
+
+    public RecyclingCenterModel update(Long id, RecyclingCenterModel recyclingCenterModel) {
+        LocationModel locationModel = recyclingCenterModel.getLocation();
+
+        if (locationModel.getLatitude() == null || locationModel.getLongitude() == null) {
+            Double[] coordinates = getCoordinates(locationModel);
+            locationModel.setLongitude(coordinates[1]);
+            locationModel.setLatitude(coordinates[0]);
+        }
+
+        RecyclingCenter updatedRecyclingCenter = recyclingCenterDAO.update(id, recyclingCenterModel);
+        RecyclingCenterModel model = recyclingCenterModelAssembler.toModel(updatedRecyclingCenter);
+        return recyclingCenterModelProcessor.process(model);
+    }
+
+    public List<RecyclingCenterModel> getAll() {
+        return recyclingCenterDAO.getAll()
                 .stream()
-                .map(x -> recyclingCenterMapper.mapToDTO(x))
-                .collect(Collectors.toList());
+                .map(recyclingCenterModelAssembler::toModel)
+                .map(recyclingCenterModelProcessor::process)
+                .toList();
     }
 }

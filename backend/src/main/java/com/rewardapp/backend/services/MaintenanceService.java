@@ -1,39 +1,31 @@
 package com.rewardapp.backend.services;
 
+import com.rewardapp.backend.dao.EmailTokenDAO;
+import com.rewardapp.backend.dao.SessionDAO;
 import com.rewardapp.backend.dao.UserDAO;
 import com.rewardapp.backend.entities.EmailToken;
-import com.rewardapp.backend.entities.Session;
-import com.rewardapp.backend.repositories.EmailTokenRepository;
-import com.rewardapp.backend.repositories.SessionRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MaintenanceService {
     private static final Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
-    private final EmailTokenRepository emailTokenRepository;
+    private final EmailTokenDAO emailTokenDAO;
     private final UserDAO userDAO;
-    private final SessionRepository sessionRepository;
-
-    private MaintenanceService(EmailTokenRepository emailTokenRepository, UserDAO userDAO, SessionRepository sessionRepository) {
-        this.emailTokenRepository = emailTokenRepository;
-        this.userDAO = userDAO;
-        this.sessionRepository = sessionRepository;
-    }
+    private final SessionDAO sessionDAO;
 
     @Scheduled(cron = "0 0 0 * * MON-SUN")
     @Scheduled(initialDelay = 1L)
     private void purgeUnverifiedUsers() {
         logger.info("Scheduler started task \"purgeUnverifiedUsers()\":");
 
-        List<EmailToken> emailTokens = emailTokenRepository
-                .removeEmailTokenByExpirationDateBefore(Timestamp.valueOf(LocalDateTime.now()));
+        List<EmailToken> emailTokens = emailTokenDAO.removeExpiredTokens();
 
         logger.info(
                 String.format("Deleted %d expired email tokens.", emailTokens.size())
@@ -54,7 +46,7 @@ public class MaintenanceService {
 
     @Scheduled(cron = "0 0 0 * * MON-SUN")
     public void purgeSessions() {
-        logger.info("Scheduler started task \"purgeUnverifiedUsers()\":");
-        List<Session> sessions = sessionRepository.removeSessionsByExpirationDateBefore(Timestamp.valueOf(LocalDateTime.now()));
+        logger.info("Scheduler started task \"purgeSessions()\":");
+        sessionDAO.removeExpiredSessions();
     }
 }

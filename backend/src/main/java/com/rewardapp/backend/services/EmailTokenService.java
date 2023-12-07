@@ -1,28 +1,30 @@
 package com.rewardapp.backend.services;
 
+import com.rewardapp.backend.dao.EmailTokenDAO;
 import com.rewardapp.backend.entities.EmailToken;
-import com.rewardapp.backend.repositories.EmailTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class EmailTokenService {
-    private final EmailTokenRepository repository;
-
-    public EmailTokenService(EmailTokenRepository repository) {
-        this.repository = repository;
-    }
+    private final EmailTokenDAO emailTokenDAO;
 
     public EmailToken create(Long userId) {
-        EmailToken token = new EmailToken();
-        token.setUserId(userId);
-        return repository.save(token);
+        EmailToken token = EmailToken.builder()
+                .token(UUID.randomUUID().toString())
+                .userId(userId)
+                .build();
+
+        return emailTokenDAO.save(token);
     }
 
     public Optional<EmailToken> findEmailByToken(String emailToken) {
-        return repository.findEmailTokenByToken(emailToken);
+        return emailTokenDAO.findByToken(emailToken);
     }
 }

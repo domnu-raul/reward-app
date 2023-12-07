@@ -1,41 +1,33 @@
 package com.rewardapp.backend.controllers;
 
-import com.rewardapp.backend.entities.EmailToken;
 import com.rewardapp.backend.entities.Session;
-import com.rewardapp.backend.entities.User;
-import com.rewardapp.backend.entities.dto.UserCredentials;
-import com.rewardapp.backend.services.EmailSenderService;
-import com.rewardapp.backend.services.EmailTokenService;
-import com.rewardapp.backend.services.SessionService;
-import com.rewardapp.backend.services.UserService;
+import com.rewardapp.backend.models.UserCredentials;
+import com.rewardapp.backend.models.UserModel;
+import com.rewardapp.backend.services.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("api/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    private final UserService userService;
-    private final SessionService sessionService;
-    private final EmailSenderService emailSenderService;
-    private final EmailTokenService emailTokenService;
+    private final AuthService authService;
 
-    public AuthController(UserService userService, SessionService sessionService, EmailSenderService emailSenderService, EmailTokenService emailTokenService) {
-        this.userService = userService;
-        this.sessionService = sessionService;
-        this.emailSenderService = emailSenderService;
-        this.emailTokenService = emailTokenService;
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<EntityModel<Session>> login(@RequestBody UserCredentials credentials, HttpServletResponse httpResponse) {
-        User user = userService.validateInternal(credentials);
-
-        Session session = sessionService.create(user);
+    //todo: make a DTO for USER and SESSION, and use them instead of the entities
+    //todo: the DTO's should extend RepresentationModel
+    @GetMapping("/login")
+    public ResponseEntity<RepresentationModel> login(@RequestBody UserCredentials credentials, HttpServletResponse httpResponse) {
+        Session session = authService.login(credentials);
 
         Cookie cookie = new Cookie("session_id", session.getSessionId());
         cookie.setPath("/");
@@ -43,53 +35,47 @@ public class AuthController {
         cookie.setHttpOnly(true);
         httpResponse.addCookie(cookie);
 
+        EntityModel<Session> sessionEntityModel = EntityModel.of(session);
+        sessionEntityModel.add(linkTo(methodOn(AuthController.class).logout(null)).withRel("logout"));
+
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(EntityModel.of(session));
+                .body(sessionEntityModel);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<EntityModel<User>> register(@RequestBody UserCredentials credentials) {
-        User user = userService.registerInternal(credentials);
-        EmailToken emailToken = emailTokenService.create(user.getId());
-        System.out.println(emailToken.getToken());
-//        emailSenderService.sendEmail("sir.c4ppuccin0@gmail.com", "test", "working");
+    public ResponseEntity<RepresentationModel> register(@RequestBody UserCredentials credentials) {
+        UserModel userModel = authService.register(credentials);
+        EntityModel<UserModel> userEntityModel = EntityModel.of(userModel);
+
+        userEntityModel.add(linkTo(methodOn(AuthController.class).logout(null)).withRel("logout"));
+        userEntityModel.add(linkTo(methodOn(AuthController.class).login(null, null)).withRel("login"));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(EntityModel.of(user));
+                .body(userEntityModel);
     }
 
     @PatchMapping("/verify/{email_token}")
-    public ResponseEntity<EntityModel<User>> verifyEmail(@PathVariable("email_token") String token) {
-        EmailToken emailToken = emailTokenService.findEmailByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email token."));
+    public ResponseEntity<RepresentationModel> verifyEmail(@PathVariable("email_token") String token) {
+        UserModel userModel = authService.verifyEmail(token);
 
-        Long userId = emailToken.getUserId();
-
-        User user = userService.setVerified(userId);
+        EntityModel<UserModel> userEntityModel = EntityModel.of(userModel);
+        userEntityModel.add(linkTo(methodOn(AuthController.class).login(null, null)).withRel("login"));
+        userEntityModel.add(linkTo(methodOn(AuthController.class).logout(null)).withRel("logout"));
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(EntityModel.of(user));
+                .body(userEntityModel);
     }
 
     @DeleteMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
-        Session session = sessionService.validateRequest(request);
-        if (session == null)
-            throw new RuntimeException("You are not logged in.");
+        Session session = authService.validateRequest(request);
+        authService.logout(session);
 
-        sessionService.logout(session.getSessionId());
-
-        return null;
-    }
-
-    @GetMapping("/ping")
-    public ResponseEntity<?> ping(HttpServletRequest request) {
-        Session session = sessionService.validateRequest(request);
         return ResponseEntity
-                .status(session == null ? HttpStatus.UNAUTHORIZED : HttpStatus.ACCEPTED)
-                .body(session == null);
+                .status(HttpStatus.OK)
+                .build();
     }
 }

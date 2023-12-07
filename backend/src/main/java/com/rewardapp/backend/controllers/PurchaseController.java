@@ -5,6 +5,7 @@ import com.rewardapp.backend.entities.Session;
 import com.rewardapp.backend.repositories.PurchaseRepository;
 import com.rewardapp.backend.services.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -18,14 +19,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/purchase")
+@RequiredArgsConstructor
 public class PurchaseController {
     private final SessionService sessionService;
     private final PurchaseRepository purchaseRepository;
-
-    public PurchaseController(SessionService sessionService, PurchaseRepository purchaseRepository) {
-        this.sessionService = sessionService;
-        this.purchaseRepository = purchaseRepository;
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Purchase>> get(@PathVariable("id") Long id, HttpServletRequest request) {
