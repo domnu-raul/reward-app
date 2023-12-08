@@ -12,7 +12,7 @@ public class Contribution extends RepresentationModel<Contribution> {
     private Long id;
     private Long userId;
     private Long recyclingCenterId;
-    private Long materialId;
+    private String material;
     private String timestamp;
     private Double quantity;
     private MeasurementType measurement;

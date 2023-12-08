@@ -8,12 +8,10 @@ import com.rewardapp.backend.models.UserCredentials;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.regex.Pattern;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserService {
     private final UserDAO userDAO;
@@ -44,10 +42,10 @@ public class UserService {
 
         user = userDAO.save(user);
 
-        InternalUser internalUser = InternalUser.builder()
-                .id(user.getId())
-                .password(hashed_password)
-                .build();
+        InternalUser internalUser = new InternalUser(
+                user.getId(),
+                hashed_password
+        );
 
         internalUserDAO.save(internalUser);
         return user;

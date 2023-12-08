@@ -15,6 +15,23 @@ import java.util.Properties;
 @Transactional
 public class EmailSenderService {
 
+    private static final String MAIL_USERNAME;
+    private static final String MAIL_PASSWORD;
+
+    static {
+        Map<String, Object> map = null;
+        try {
+            JSONParser parser = new JSONParser(new FileReader("src/main/resources/data.json"));
+            map = parser.parseObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Map<String, String> body = (Map<String, String>) map.get("email");
+
+        MAIL_USERNAME = body.get("username");
+        MAIL_PASSWORD = body.get("password");
+    }
+
     private final JavaMailSender mailSender;
 
     public EmailSenderService() {
@@ -22,20 +39,8 @@ public class EmailSenderService {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        Map<String, Object> map = null;
-        try {
-            JSONParser parser = new JSONParser(new FileReader("src/main/resources/email.json"));
-            map = parser.parseObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Map<String, String> body = (Map<String, String>) map.get("email");
-
-        String username = body.get("username");
-        String password = body.get("password");
-
-        mailSender.setUsername(username);
-        mailSender.setPassword(password);
+        mailSender.setUsername(MAIL_USERNAME);
+        mailSender.setPassword(MAIL_PASSWORD);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

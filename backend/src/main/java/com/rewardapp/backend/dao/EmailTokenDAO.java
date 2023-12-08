@@ -18,12 +18,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class EmailTokenDAO {
-    private static final RowMapper<EmailToken> rowMapper = (rs, rowNum) -> EmailToken.builder()
-            .id(rs.getLong("id"))
-            .token(rs.getString("token"))
-            .expirationDate(rs.getDate("expiration_date"))
-            .userId(rs.getLong("user_id"))
-            .build();
+    private static final RowMapper<EmailToken> rowMapper = RowMappers.emailTokenMapper;
     private final JdbcTemplate jdbcTemplate;
 
     public Optional<EmailToken> findByToken(String token) {
@@ -59,11 +54,11 @@ public class EmailTokenDAO {
         }, keyHolder);
         Map<String, Object> keys = keyHolder.getKeys();
 
-        return EmailToken.builder()
-                .id((Long) keys.get("id"))
-                .userId((Long) keys.get("user_id"))
-                .expirationDate((Date) keys.get("expiration_date"))
-                .token((String) keys.get("token"))
-                .build();
+        return new EmailToken(
+                (Long) keys.get("id"),
+                (String) keys.get("token"),
+                (Date) keys.get("expiration_date"),
+                (Long) keys.get("user_id")
+        );
     }
 }

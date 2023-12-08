@@ -7,10 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InternalUserDAO {
-    private static final RowMapper<InternalUser> rowMapper = (rs, rowNum) -> InternalUser.builder()
-            .id(rs.getLong("id"))
-            .password(rs.getString("password"))
-            .build();
+    private static final RowMapper<InternalUser> rowMapper = RowMappers.internalUserMapper;
     private final JdbcTemplate jdbcTemplate;
 
 

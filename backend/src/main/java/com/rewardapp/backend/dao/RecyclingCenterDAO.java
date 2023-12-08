@@ -21,29 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Transactional
 public class RecyclingCenterDAO {
-    private static final RowMapper<RecyclingCenter> rowMapper = (rs, rowNum) -> {
-
-        Location location = new Location(
-                rs.getString("county"),
-                rs.getString("city"),
-                rs.getString("address"),
-                rs.getString("zipcode"),
-                rs.getDouble("latitude"),
-                rs.getDouble("longitude")
-        );
-
-        if (location.getLatitude() == 0D) location.setLatitude(null);
-        if (location.getLongitude() == 0D) location.setLongitude(null);
-
-        return new RecyclingCenter(
-                rs.getLong("id"),
-                rs.getString("name"),
-                null,
-                location,
-                rs.getTime("start_time"),
-                rs.getTime("end_time")
-        );
-    };
+    private static final RowMapper<RecyclingCenter> rowMapper = RowMappers.recyclingCenterMapper;
 
     private final JdbcTemplate jdbcTemplate;
 

@@ -16,16 +16,7 @@ import java.util.Map;
 
 @Component
 public class ContributionDAO {
-    private static final RowMapper<Contribution> rowMapper = (rs, rownum) -> new Contribution(
-            rs.getLong("id"),
-            rs.getLong("user_id"),
-            rs.getLong("recycling_center_id"),
-            rs.getLong("material_id"),
-            rs.getTimestamp("timestamp").toString(),
-            rs.getDouble("quantity"),
-            Contribution.MeasurementType.valueOf(rs.getString("measurment")),
-            rs.getLong("reward")
-    );
+    private static final RowMapper<Contribution> rowMapper = RowMappers.contributionMapper;
     private final JdbcTemplate jdbcTemplate;
 
     public ContributionDAO(JdbcTemplate jdbcTemplate) {
@@ -33,17 +24,40 @@ public class ContributionDAO {
     }
 
     public Contribution getContributionById(Long id) {
-        String sql = "SELECT * FROM contributions WHERE id = ?";
+        String sql = "SELECT c.id, c.measurment, c.user_id, c.recycling_center_id, c.timestamp, c.quantity, c.reward, m.name " +
+                "FROM contributions c JOIN public.materials m on m.id = c.material_id WHERE c.id = ?";
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
     public List<Contribution> getContributionsByUserId(Long userId) {
-        String sql = "SELECT * FROM contributions WHERE user_id = ?";
+        String sql = "SELECT c.id, c.measurment, c.user_id, c.recycling_center_id, c.timestamp, c.quantity, c.reward, m.name " +
+                "FROM contributions c JOIN public.materials m on m.id = c.material_id WHERE c.user_id = ?";
         return jdbcTemplate.query(sql, rowMapper, userId);
     }
 
+    public void validate(Contribution contribution) {
+        String reward_sql = "SELECT reward FROM reward_system WHERE material_id = (SELECT id FROM materials WHERE name = ?) AND measurment = ?::measurment_type";
+        String validate_sql = "SELECT id FROM recycling_centers_materials " +
+                "WHERE material_id = (SELECT id FROM materials WHERE name = ?)" +
+                "AND recycling_center_id = ?";
+        try {
+            jdbcTemplate.queryForObject(validate_sql, Long.class, contribution.getMaterial(), contribution.getRecyclingCenterId());
+        } catch (Exception e) {
+            throw new RuntimeException("This material is not accepted by the recycling center");
+        }
+
+        Long reward;
+        try {
+            reward = jdbcTemplate.queryForObject(reward_sql, Long.class, contribution.getMaterial(), contribution.getMeasurement().toString());
+        } catch (Exception e) {
+            throw new RuntimeException("No reward for this material and measurement type");
+        }
+
+        contribution.setReward(reward * contribution.getQuantity().longValue());
+    }
+
     public Contribution save(Contribution contribution) {
-        String sql = "INSERT INTO contributions (user_id, recycling_center_id, quantity, measurment, material_id) VALUES (?, ?, ?, ?::measurment_type, ?)";
+        String sql = "INSERT INTO contributions (user_id, recycling_center_id, quantity, measurment, material_id, reward) VALUES (?, ?, ?, ?::measurment_type, (SELECT id FROM materials WHERE name = ?), ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(con -> {
@@ -52,7 +66,8 @@ public class ContributionDAO {
             ps.setLong(2, contribution.getRecyclingCenterId());
             ps.setDouble(3, contribution.getQuantity());
             ps.setString(4, contribution.getMeasurement().toString());
-            ps.setLong(5, contribution.getMaterialId());
+            ps.setString(5, contribution.getMaterial());
+            ps.setLong(6, contribution.getReward());
             return ps;
         }, keyHolder);
 
@@ -62,11 +77,11 @@ public class ContributionDAO {
                 (Long) keys.get("id"),
                 contribution.getUserId(),
                 contribution.getRecyclingCenterId(),
-                contribution.getMaterialId(),
+                contribution.getMaterial(),
                 Timestamp.valueOf(LocalDateTime.now()).toString(),
                 contribution.getQuantity(),
                 contribution.getMeasurement(),
-                contribution.getReward()
+                (Long) keys.get("reward")
         );
     }
 }

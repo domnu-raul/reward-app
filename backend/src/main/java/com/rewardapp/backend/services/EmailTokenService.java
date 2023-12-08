@@ -16,10 +16,9 @@ public class EmailTokenService {
     private final EmailTokenDAO emailTokenDAO;
 
     public EmailToken save(Long userId) {
-        EmailToken token = EmailToken.builder()
-                .token(UUID.randomUUID().toString())
-                .userId(userId)
-                .build();
+        EmailToken token = new EmailToken();
+        token.setToken((UUID.randomUUID().toString()));
+        token.setUserId(userId);
 
         return emailTokenDAO.save(token);
     }

@@ -1,12 +1,14 @@
 package com.rewardapp.backend.entities;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmailToken {
     private Long id;
     private String token;

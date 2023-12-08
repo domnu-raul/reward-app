@@ -15,7 +15,7 @@ public class ContributionProcessor implements RepresentationModelProcessor<Contr
     @Override
     public Contribution process(Contribution model) {
         return model.add(
-                linkTo(methodOn(ContributionController.class).get(model.getId(), null)).withSelfRel(),
+                linkTo(methodOn(ContributionController.class).get(model.getId(), null)).withRel("details"),
                 linkTo(methodOn(RecyclingCenterController.class).get(model.getRecyclingCenterId(), null)).withRel("recycling_center"),
                 linkTo(methodOn(ContributionController.class).getAll(null)).withRel("all")
         );

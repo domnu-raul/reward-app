@@ -6,24 +6,40 @@ import com.rewardapp.backend.dao.RecyclingCenterDAO;
 import com.rewardapp.backend.models.Location;
 import com.rewardapp.backend.models.RecyclingCenter;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.FileReader;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class RecyclingCenterService {
+    private static final String GOOGLE_API_KEY;
+
+    static {
+        Map<String, Object> map = null;
+        try {
+            JSONParser parser = new JSONParser(new FileReader("src/main/resources/data.json"));
+            map = parser.parseObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        GOOGLE_API_KEY = (String) map.get("apiKey");
+    }
+
     private final RecyclingCenterDAO recyclingCenterDAO;
 
     private static Double[] getCoordinates(Location locationModel) {
         String address = locationModel.getAddress() + ", " + locationModel.getCity() + ", " + locationModel.getCounty() + ", " + locationModel.getZipcode();
         address = address.replace(" ", "+");
         address = address.replace(",", "%2C");
-        String GOOGLE_API_KEY = "AIzaSyDmV5M3u4CcccC-VFtqDMLtzvpiOTw0lE0";
         String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s", address, GOOGLE_API_KEY);
 
         RestTemplate restTemplate = new RestTemplate();

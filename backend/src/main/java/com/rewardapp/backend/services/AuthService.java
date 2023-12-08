@@ -40,7 +40,7 @@ public class AuthService {
     public Session validateAdminRequest(HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
         User user = userService.getUserById(session.getUserId());
-        if (user.getType() == User.UserType.ADMIN) {
+        if (user.getType() != User.UserType.ADMIN) {
             throw new RuntimeException("You must be an admin to perform this action.");
         }
         return session;

@@ -16,12 +16,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class SessionDAO {
-    private static final RowMapper<Session> rowMapper = (rs, rowNum) -> new Session(
-            rs.getLong("id"),
-            rs.getString("session_id"),
-            rs.getDate("expiration_date"),
-            rs.getLong("user_id")
-    );
+    private static final RowMapper<Session> rowMapper = RowMappers.sessionMapper;
 
     private final JdbcTemplate jdbcTemplate;
 

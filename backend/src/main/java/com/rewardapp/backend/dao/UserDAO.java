@@ -16,14 +16,7 @@ import java.util.Map;
 
 @Component
 public class UserDAO {
-    private static final RowMapper<User> rowMapper = (rs, rownum) -> new User(
-            rs.getLong("id"),
-            rs.getString("username"),
-            rs.getString("email"),
-            rs.getBoolean("verified"),
-            rs.getDate("register_date").toString(),
-            User.UserType.valueOf(rs.getString("type"))
-    );
+    private static final RowMapper<User> rowMapper = RowMappers.userMapper;
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final JdbcTemplate jdbcTemplate;

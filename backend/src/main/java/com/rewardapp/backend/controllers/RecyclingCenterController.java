@@ -6,7 +6,6 @@ import com.rewardapp.backend.services.RecyclingCenterService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,7 @@ public class RecyclingCenterController {
     private final AuthService authService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<RepresentationModel<RecyclingCenter>> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+    public ResponseEntity<RecyclingCenter> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
         authService.validateRequest(request);
 
         return ResponseEntity
@@ -42,7 +41,7 @@ public class RecyclingCenterController {
     }
 
     @PostMapping
-    public ResponseEntity<RepresentationModel<RecyclingCenter>> create(@RequestBody RecyclingCenter recyclingCenter, HttpServletRequest request) {
+    public ResponseEntity<RecyclingCenter> create(@RequestBody RecyclingCenter recyclingCenter, HttpServletRequest request) {
         authService.validateAdminRequest(request);
 
         return ResponseEntity
@@ -51,7 +50,7 @@ public class RecyclingCenterController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<RepresentationModel<RecyclingCenter>> update(@PathVariable("id") Long id, @RequestBody RecyclingCenter recyclingCenter, HttpServletRequest request) {
+    public ResponseEntity<RecyclingCenter> update(@PathVariable("id") Long id, @RequestBody RecyclingCenter recyclingCenter, HttpServletRequest request) {
         authService.validateAdminRequest(request);
 
         return ResponseEntity
