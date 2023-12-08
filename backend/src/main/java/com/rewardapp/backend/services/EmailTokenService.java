@@ -15,7 +15,7 @@ import java.util.UUID;
 public class EmailTokenService {
     private final EmailTokenDAO emailTokenDAO;
 
-    public EmailToken create(Long userId) {
+    public EmailToken save(Long userId) {
         EmailToken token = EmailToken.builder()
                 .token(UUID.randomUUID().toString())
                 .userId(userId)

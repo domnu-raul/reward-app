@@ -1,6 +1,6 @@
 package com.rewardapp.backend.dao;
 
-import com.rewardapp.backend.entities.User;
+import com.rewardapp.backend.models.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -8,7 +8,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collections;
@@ -22,7 +21,7 @@ public class UserDAO {
             rs.getString("username"),
             rs.getString("email"),
             rs.getBoolean("verified"),
-            rs.getDate("register_date"),
+            rs.getDate("register_date").toString(),
             User.UserType.valueOf(rs.getString("type"))
     );
 
@@ -50,16 +49,14 @@ public class UserDAO {
         }, keyHolder);
 
         Map<String, Object> keys = keyHolder.getKeys();
-        User user = new User(
+        return new User(
                 (Long) keys.get("id"),
                 (String) keys.get("username"),
                 (String) keys.get("email"),
                 (Boolean) keys.get("verified"),
-                (Date) keys.get("register_date"),
+                keys.get("register_date").toString(),
                 User.UserType.valueOf((String) keys.get("type"))
         );
-
-        return user;
     }
 
     public User getUserById(Long id) {
@@ -90,7 +87,7 @@ public class UserDAO {
                 (String) keys.get("username"),
                 (String) keys.get("email"),
                 (Boolean) keys.get("verified"),
-                (Date) keys.get("register_date"),
+                keys.get("register_date").toString(),
                 User.UserType.valueOf((String) keys.get("type"))
         );
     }

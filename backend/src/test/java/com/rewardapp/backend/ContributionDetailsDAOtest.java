@@ -14,7 +14,7 @@ public class ContributionDetailsDAOtest {
 
     @Test
     void getContributionDetails() {
-        ContributionDetails contributionDetails = contributionDetailsDAO.getContributionDetails(12L).orElseThrow();
+        ContributionDetails contributionDetails = contributionDetailsDAO.getContributionDetails(19L).orElseThrow();
         Assert.notNull(contributionDetails, "ContributionModel is null");
         Assert.notNull(contributionDetails.getRecyclingCenter(), "RecyclingCenterModel is null");
         Assert.notNull(contributionDetails.getRecyclingCenter().getLocation(), "LocationModel is null");

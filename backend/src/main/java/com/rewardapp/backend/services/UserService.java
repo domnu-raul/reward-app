@@ -3,10 +3,8 @@ package com.rewardapp.backend.services;
 import com.rewardapp.backend.dao.InternalUserDAO;
 import com.rewardapp.backend.dao.UserDAO;
 import com.rewardapp.backend.entities.InternalUser;
-import com.rewardapp.backend.entities.User;
+import com.rewardapp.backend.models.User;
 import com.rewardapp.backend.models.UserCredentials;
-import com.rewardapp.backend.models.UserModel;
-import com.rewardapp.backend.models.assemblers.UserModelAssembler;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserDAO userDAO;
     private final InternalUserDAO internalUserDAO;
-    private final UserModelAssembler userModelAssembler;
 
     public User validate(UserCredentials credentials) {
         User user = userDAO.getUserByUsername(credentials.username());
@@ -32,7 +29,7 @@ public class UserService {
             throw new RuntimeException("Incorrect password.");
     }
 
-    public UserModel register(UserCredentials credentials) {
+    public User register(UserCredentials credentials) {
         Pattern email_validation = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 
         if (!email_validation.matcher(credentials.email()).matches())
@@ -53,22 +50,18 @@ public class UserService {
                 .build();
 
         internalUserDAO.save(internalUser);
-
-        return userModelAssembler.toModel(user);
+        return user;
     }
 
-    public UserModel setVerified(Long userId) {
-        User user = userDAO.setVerified(userId);
-        return userModelAssembler.toModel(user);
+    public User setVerified(Long userId) {
+        return userDAO.setVerified(userId);
     }
 
-    public UserModel getUserByUsername(String username) {
-        User user = userDAO.getUserByUsername(username);
-        return userModelAssembler.toModel(user);
+    public User getUserByUsername(String username) {
+        return userDAO.getUserByUsername(username);
     }
 
-    public UserModel getUserById(Long id) {
-        User user = userDAO.getUserById(id);
-        return userModelAssembler.toModel(user);
+    public User getUserById(Long id) {
+        return userDAO.getUserById(id);
     }
 }

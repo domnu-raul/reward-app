@@ -3,7 +3,7 @@ package com.rewardapp.backend.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rewardapp.backend.dao.RecyclingCenterDAO;
-import com.rewardapp.backend.models.LocationModel;
+import com.rewardapp.backend.models.Location;
 import com.rewardapp.backend.models.RecyclingCenter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.util.List;
 public class RecyclingCenterService {
     private final RecyclingCenterDAO recyclingCenterDAO;
 
-    private static Double[] getCoordinates(LocationModel locationModel) {
+    private static Double[] getCoordinates(Location locationModel) {
         String address = locationModel.getAddress() + ", " + locationModel.getCity() + ", " + locationModel.getCounty() + ", " + locationModel.getZipcode();
         address = address.replace(" ", "+");
         address = address.replace(",", "%2C");
@@ -45,13 +45,13 @@ public class RecyclingCenterService {
         return new Double[]{lat, lng};
     }
 
-    public RecyclingCenter create(RecyclingCenter recyclingCenter) {
-        LocationModel locationModel = recyclingCenter.getLocation();
+    public RecyclingCenter save(RecyclingCenter recyclingCenter) {
+        Location location = recyclingCenter.getLocation();
 
-        if (locationModel.getLatitude() == null || locationModel.getLongitude() == null) {
-            Double[] coordinates = getCoordinates(locationModel);
-            locationModel.setLongitude(coordinates[1]);
-            locationModel.setLatitude(coordinates[0]);
+        if (location.getLatitude() == null || location.getLongitude() == null) {
+            Double[] coordinates = getCoordinates(location);
+            location.setLongitude(coordinates[1]);
+            location.setLatitude(coordinates[0]);
         }
 
         return recyclingCenterDAO.save(recyclingCenter);
@@ -66,12 +66,12 @@ public class RecyclingCenterService {
     }
 
     public RecyclingCenter update(Long id, RecyclingCenter recyclingCenter) {
-        LocationModel locationModel = recyclingCenter.getLocation();
+        Location location = recyclingCenter.getLocation();
 
-        if (locationModel.getLatitude() == null || locationModel.getLongitude() == null) {
-            Double[] coordinates = getCoordinates(locationModel);
-            locationModel.setLongitude(coordinates[1]);
-            locationModel.setLatitude(coordinates[0]);
+        if (location.getLatitude() == null || location.getLongitude() == null) {
+            Double[] coordinates = getCoordinates(location);
+            location.setLongitude(coordinates[1]);
+            location.setLatitude(coordinates[0]);
         }
 
         return recyclingCenterDAO.update(id, recyclingCenter);

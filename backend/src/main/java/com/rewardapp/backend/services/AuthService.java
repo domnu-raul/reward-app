@@ -1,18 +1,15 @@
 package com.rewardapp.backend.services;
 
 import com.rewardapp.backend.entities.EmailToken;
-import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.models.Session;
+import com.rewardapp.backend.models.User;
 import com.rewardapp.backend.models.UserCredentials;
-import com.rewardapp.backend.models.UserModel;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 @Service
 @Transactional
@@ -25,7 +22,7 @@ public class AuthService {
 
     public Session login(UserCredentials userCredentials, HttpServletResponse httpResponse) {
         User user = userService.validate(userCredentials);
-        Session session = sessionService.create(user);
+        Session session = sessionService.save(user);
 
         Cookie cookie = new Cookie("session_id", session.getSessionId());
         cookie.setPath("/");
@@ -42,15 +39,15 @@ public class AuthService {
 
     public Session validateAdminRequest(HttpServletRequest request) {
         Session session = sessionService.validateRequest(request);
-        UserModel user = userService.getUserById(session.getUserId());
-        if (!Objects.equals(user.getType(), User.UserType.ADMIN.toString())) {
+        User user = userService.getUserById(session.getUserId());
+        if (user.getType() == User.UserType.ADMIN) {
             throw new RuntimeException("You must be an admin to perform this action.");
         }
         return session;
     }
 
-    public UserModel register(UserCredentials userCredentials) {
-        UserModel user = userService.register(userCredentials);
+    public User register(UserCredentials userCredentials) {
+        User user = userService.register(userCredentials);
 //        emailSenderService.sendEmail(user.getEmail(), "Verify your email", "http://localhost:8080/api/auth/verify/" + emailTokenService.create(user.getId()).getToken());
 
         return user;
@@ -61,36 +58,35 @@ public class AuthService {
         return null;
     }
 
-    public UserModel verifyEmail(String token) {
+    public User verifyEmail(String token) {
         EmailToken emailToken = emailTokenService.findEmailByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid token."));
 
         return userService.setVerified(emailToken.getUserId());
     }
 
-    public UserModel getUser(Session session) {
+    public User getUser(Session session) {
         return userService.getUserById(session.getUserId());
     }
 
     //todo: implement a status representation for the logout
     public void logout(Session session) {
         sessionService.logout(session);
-
     }
 
     public void logoutAll(User user) {
 //        sessionService.logoutAll(user);
     }
 
-    public UserModel changePassword(User user, String newPassword) {
+    public User changePassword(User user, String newPassword) {
         return null;
     }
 
-    public UserModel changeEmail(User user, String newEmail) {
+    public User changeEmail(User user, String newEmail) {
         return null;
     }
 
-    public UserModel changeUsername(User user, String newUsername) {
+    public User changeUsername(User user, String newUsername) {
         return null;
     }
 }

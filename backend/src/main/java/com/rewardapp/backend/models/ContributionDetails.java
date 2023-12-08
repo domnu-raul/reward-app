@@ -1,6 +1,5 @@
 package com.rewardapp.backend.models;
 
-import com.rewardapp.backend.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

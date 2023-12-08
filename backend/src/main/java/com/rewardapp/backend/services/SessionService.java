@@ -1,8 +1,8 @@
 package com.rewardapp.backend.services;
 
 import com.rewardapp.backend.dao.SessionDAO;
-import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.models.Session;
+import com.rewardapp.backend.models.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class SessionService {
     private final SessionDAO sessionDAO;
 
-    public Session create(User user) {
+    public Session save(User user) {
         Session session = new Session();
         session.setSessionId(UUID.randomUUID().toString());
         session.setUserId(user.getId());

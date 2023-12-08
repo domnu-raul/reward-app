@@ -1,7 +1,7 @@
 package com.rewardapp.backend.dao;
 
 import com.rewardapp.backend.entities.Material;
-import com.rewardapp.backend.models.LocationModel;
+import com.rewardapp.backend.models.Location;
 import com.rewardapp.backend.models.RecyclingCenter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class RecyclingCenterDAO {
     private static final RowMapper<RecyclingCenter> rowMapper = (rs, rowNum) -> {
 
-        LocationModel location = new LocationModel(
+        Location location = new Location(
                 rs.getString("county"),
                 rs.getString("city"),
                 rs.getString("address"),
@@ -129,7 +129,7 @@ public class RecyclingCenterDAO {
 
         Map<String, Object> location_keys = keyHolder.getKeys();
 
-        LocationModel location = new LocationModel(
+        Location location = new Location(
                 location_keys.get("county").toString(),
                 location_keys.get("city").toString(),
                 location_keys.get("address").toString(),

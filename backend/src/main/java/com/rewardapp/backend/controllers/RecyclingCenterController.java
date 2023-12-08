@@ -47,7 +47,7 @@ public class RecyclingCenterController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(recyclingCenterService.create(recyclingCenter));
+                .body(recyclingCenterService.save(recyclingCenter));
     }
 
     @PatchMapping("/{id}")

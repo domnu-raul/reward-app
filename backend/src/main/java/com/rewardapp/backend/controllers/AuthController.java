@@ -1,8 +1,8 @@
 package com.rewardapp.backend.controllers;
 
 import com.rewardapp.backend.models.Session;
+import com.rewardapp.backend.models.User;
 import com.rewardapp.backend.models.UserCredentials;
-import com.rewardapp.backend.models.UserModel;
 import com.rewardapp.backend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,14 +26,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RepresentationModel<UserModel>> register(@RequestBody UserCredentials credentials) {
+    public ResponseEntity<RepresentationModel<User>> register(@RequestBody UserCredentials credentials) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authService.register(credentials));
     }
 
     @PatchMapping("/verify/{email_token}")
-    public ResponseEntity<RepresentationModel<UserModel>> verifyEmail(@PathVariable("email_token") String token) {
+    public ResponseEntity<RepresentationModel<User>> verifyEmail(@PathVariable("email_token") String token) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(authService.verifyEmail(token));

@@ -1,9 +1,9 @@
 package com.rewardapp.backend.dao;
 
-import com.rewardapp.backend.entities.User;
 import com.rewardapp.backend.models.ContributionDetails;
-import com.rewardapp.backend.models.LocationModel;
+import com.rewardapp.backend.models.Location;
 import com.rewardapp.backend.models.RecyclingCenter;
+import com.rewardapp.backend.models.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,14 +21,14 @@ public class ContributionDetailsDAO {
                     rs.getString("username"),
                     rs.getString("u_email"),
                     rs.getBoolean("u_verified"),
-                    rs.getDate("u_register_date"),
-                    User.UserType.valueOf(rs.getString("type"))
+                    rs.getDate("u_register_date").toString(),
+                    User.UserType.valueOf(rs.getString("u_type"))
             ),
             new RecyclingCenter(
                     rs.getLong("rc_id"),
                     rs.getString("rc_name"),
                     null,
-                    new LocationModel(
+                    new Location(
                             rs.getString("l_county"),
                             rs.getString("l_city"),
                             rs.getString("l_address"),
@@ -61,6 +61,7 @@ public class ContributionDetailsDAO {
                 "u.email AS u_email, " +
                 "u.verified AS u_verified, " +
                 "u.register_date AS u_register_date, " +
+                "u.type AS u_type, " +
                 "rc.name AS rc_name, " +
                 "rc.start_time AS rc_start_time, " +
                 "rc.end_time AS rc_end_time, " +
@@ -78,15 +79,13 @@ public class ContributionDetailsDAO {
                 "JOIN public.materials m ON m.id = c.material_id " +
                 "WHERE c.id = ?";
 
-        try {
-            ContributionDetails contributionDetails = jdbcTemplate.queryForObject(sql, rowMapper, id);
+        ContributionDetails contributionDetails = jdbcTemplate.queryForObject(sql, rowMapper, id);
+
+        if (contributionDetails.getRecyclingCenter() != null) {
             String materials_sql = "SELECT m.name FROM materials m JOIN contributions c ON m.id = c.material_id WHERE c.id = ?";
             contributionDetails.getRecyclingCenter().setMaterials(jdbcTemplate.queryForList(materials_sql, String.class, id));
-
-            return Optional.of(contributionDetails);
-        } catch (Exception e) {
-            return Optional.empty();
         }
 
+        return Optional.ofNullable(contributionDetails);
     }
 }

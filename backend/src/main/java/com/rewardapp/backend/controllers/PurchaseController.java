@@ -1,6 +1,6 @@
 package com.rewardapp.backend.controllers;
 
-import com.rewardapp.backend.services.SessionService;
+import com.rewardapp.backend.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,7 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/purchase")
 @RequiredArgsConstructor
 public class PurchaseController {
-    private final SessionService sessionService;
+    private final AuthService authService;
+    //todo: add 'all' endpoint
+    //todo: add 'get' endpoint
+    //todo: add 'post' endpoint
+    //todo: add 'options' endpoint
+    //todo: add 'options/post' endpoint
 //    private final PurchaseRepository purchaseRepository;
 //
 //    @GetMapping("/{id}")

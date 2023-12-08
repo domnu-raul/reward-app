@@ -15,7 +15,7 @@ public class RecyclingCenter extends RepresentationModel<RecyclingCenter> {
     private Long id;
     private String name;
     private List<String> materials;
-    private LocationModel location;
+    private Location location;
     private Time startTime;
     private Time endTime;
 }

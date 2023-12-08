@@ -1,20 +1,19 @@
-package com.rewardapp.backend.entities;
+package com.rewardapp.backend.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.sql.Timestamp;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Contribution {
+public class Contribution extends RepresentationModel<Contribution> {
     private Long id;
     private Long userId;
     private Long recyclingCenterId;
     private Long materialId;
-    private Timestamp timestamp;
+    private String timestamp;
     private Double quantity;
     private MeasurementType measurement;
     private Long reward;

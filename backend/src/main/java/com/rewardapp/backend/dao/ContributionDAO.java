@@ -1,6 +1,6 @@
 package com.rewardapp.backend.dao;
 
-import com.rewardapp.backend.entities.Contribution;
+import com.rewardapp.backend.models.Contribution;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class ContributionDAO {
             rs.getLong("user_id"),
             rs.getLong("recycling_center_id"),
             rs.getLong("material_id"),
-            rs.getTimestamp("timestamp"),
+            rs.getTimestamp("timestamp").toString(),
             rs.getDouble("quantity"),
             Contribution.MeasurementType.valueOf(rs.getString("measurment")),
             rs.getLong("reward")
@@ -62,7 +63,7 @@ public class ContributionDAO {
                 contribution.getUserId(),
                 contribution.getRecyclingCenterId(),
                 contribution.getMaterialId(),
-                new Timestamp(System.currentTimeMillis()),
+                Timestamp.valueOf(LocalDateTime.now()).toString(),
                 contribution.getQuantity(),
                 contribution.getMeasurement(),
                 contribution.getReward()
