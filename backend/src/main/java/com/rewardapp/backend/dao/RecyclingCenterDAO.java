@@ -32,6 +32,7 @@ public class RecyclingCenterDAO {
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
+    // todo: rename order to sort.
     public List<RecyclingCenter> getAll(List<String> materials, String search,
             String order, Boolean reverse,
             Boolean open, Integer page) {
@@ -40,20 +41,22 @@ public class RecyclingCenterDAO {
         List<String> order_by = new ArrayList<>();
 
         if (open != null) {
-            String open_filter = "(CURRENT_TIME BETWEEN start_time AND end_time)";
-            if (!open)
-                open_filter = "NOT " + open_filter;
+            where.add(new StringBuilder()
+                    .append(open == null ? "" : (open == true ? "" : "NOT "))
+                    .append("(CURRENT_TIME BETWEEN start_time AND end_time)")
+                    .toString()
 
-            where.add(open_filter);
+            );
         }
 
         if (materials != null && !materials.isEmpty()) {
-            String materials_filter = "ARRAY[" +
-                    String.join(", ",
-                            materials.stream().map(x -> "'" + x + "'").toList())
-                    +
-                    "]::varchar[] <@ materials";
-            where.add(materials_filter);
+            where.add(
+                    new StringBuilder()
+                            .append("ARRAY[")
+                            .append(String.join(
+                                    ", ", materials.stream().map(x -> "'" + x + "'").toList()))
+                            .append("]::varchar[] <@ materials")
+                            .toString());
         }
 
         if (search != null && !search.isEmpty()) {
@@ -75,9 +78,14 @@ public class RecyclingCenterDAO {
         String where_filter = where.isEmpty() ? "" : "WHERE " + String.join(" AND ", where);
         String order_by_filter = order_by.isEmpty() ? "" : "ORDER BY " + String.join(", ", order_by);
 
-        String sql = "SELECT * FROM recycling_centers_view " + where_filter + " " +
-                order_by_filter + " "
-                + "LIMIT 20 OFFSET " + page * 20;
+        String sql = new StringBuilder()
+                .append("SELECT * FROM recycling_centers_view ")
+                .append(where_filter)
+                .append(" ")
+                .append(order_by_filter)
+                .append(" LIMIT 20 OFFSET ")
+                .append(page * 20)
+                .toString();
 
         return jdbcTemplate.query(sql, rowMapper);
     }
