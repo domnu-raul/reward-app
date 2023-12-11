@@ -1,7 +1,7 @@
 package com.rewardapp.backend.controllers;
 
-import com.rewardapp.backend.dao.UserDataDAO;
-import com.rewardapp.backend.models.UserData;
+import com.rewardapp.backend.dao.UserDetailsDAO;
+import com.rewardapp.backend.models.UserDetails;
 import com.rewardapp.backend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,25 +12,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/userdata")
+@RequestMapping("/api/user-details")
 @RequiredArgsConstructor
 public class UserDataController {
-    private final UserDataDAO userDataDAO;
+    private final UserDetailsDAO userDetailsDAO;
     private final AuthService authService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserData> getUserDataById(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<UserDetails> getUserDataById(@PathVariable Long id, HttpServletRequest request) {
         authService.validateAdminRequest(request);
 
         return ResponseEntity
                 .status(200)
-                .body(userDataDAO.getUserData(id));
+                .body(userDetailsDAO.getUserData(id));
     }
 
     @GetMapping()
-    public ResponseEntity<UserData> getUserData(HttpServletRequest request) {
+    public ResponseEntity<UserDetails> getUserData(HttpServletRequest request) {
         return ResponseEntity
                 .status(200)
-                .body(userDataDAO.getUserData(authService.validateRequest(request).getUserId()));
+                .body(userDetailsDAO.getUserData(authService.validateRequest(request).getUserId()));
     }
 }

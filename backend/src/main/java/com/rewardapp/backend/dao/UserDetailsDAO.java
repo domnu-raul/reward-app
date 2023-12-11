@@ -37,7 +37,7 @@ public class UserDataDAO {
 
     public UserData getUserData(Long userId) {
         String contribution_sql = "SELECT c.id, c.measurment, c.user_id, c.recycling_center_id, c.timestamp, c.quantity, c.reward, m.name " +
-                "FROM contributions c JOIN public.materials m on m.id = c.material_id WHERE c.user_id = ?";
+                "FROM contributions c JOIN public.materials m on m.id = c.material_id WHERE c.user_id = ? ORDER BY c.timestamp DESC";
 
         User user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id = ?", userMapper, userId);
         UserStatistics statistics = jdbcTemplate.queryForObject("SELECT * FROM user_stats WHERE user_id = ?", statisticsMapper, userId);
