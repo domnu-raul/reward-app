@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.FileReader;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class RecyclingCenterService {
     private static final String GOOGLE_API_KEY;
@@ -93,7 +91,11 @@ public class RecyclingCenterService {
         return recyclingCenterDAO.update(id, recyclingCenter);
     }
 
-    public List<RecyclingCenter> getAll() {
-        return recyclingCenterDAO.getAll();
+    public List<RecyclingCenter> getAll(List<String> materials, String search, String order, Boolean reverse, Boolean open, Integer page) {
+        return recyclingCenterDAO.getAll(materials, search, order, reverse, open, page);
+    }
+
+    public List<RecyclingCenter> getClosest(Double lat, Double lng) {
+        return recyclingCenterDAO.getClosest(lat, lng);
     }
 }

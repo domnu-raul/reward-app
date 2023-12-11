@@ -1,45 +1,59 @@
 package com.rewardapp.backend.controllers;
 
+import com.rewardapp.backend.models.Purchase;
+import com.rewardapp.backend.models.PurchaseOption;
+import com.rewardapp.backend.models.Session;
 import com.rewardapp.backend.services.AuthService;
+import com.rewardapp.backend.services.PurchaseService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/purchase")
 @RequiredArgsConstructor
 public class PurchaseController {
     private final AuthService authService;
+    private final PurchaseService purchaseService;
     //todo: add 'all' endpoint
     //todo: add 'get' endpoint
     //todo: add 'post' endpoint
     //todo: add 'options' endpoint
     //todo: add 'options/post' endpoint
-//    private final PurchaseRepository purchaseRepository;
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<EntityModel<Purchase>> get(@PathVariable("id") Long id, HttpServletRequest request) {
-//        Session session = sessionService.validateRequest(request);
-//
-//        Purchase purchase = purchaseRepository.getPurchaseByIdAndUserId(id, session.getUserId());
-//
-//        EntityModel<Purchase> response = EntityModel.of(purchase);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(response);
-//    }
-//
-//    @GetMapping("/all")
-//    public ResponseEntity<CollectionModel<Purchase>> getAll(HttpServletRequest request) {
-//        Session session = sessionService.validateRequest(request);
-//
-//        List<Purchase> purchases = purchaseRepository.getAllByUserId(session.getUserId());
-//
-//        CollectionModel<Purchase> response = CollectionModel.of(purchases);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(response);
-//    }
+
+    @GetMapping("/all")
+    public ResponseEntity<CollectionModel<Purchase>> getAllPurchases(HttpServletRequest request, @PathParam("page") Integer page) {
+        page = page == null || page <= 0 ? 0 : page - 1;
+
+        Session session = authService.validateRequest(request);
+        List<Purchase> purchases = purchaseService.getPurchasesByUserId(session.getUserId(), page);
+
+        return ResponseEntity
+                .ok(CollectionModel.of(purchases));
+    }
+
+    @GetMapping("/options")
+    public ResponseEntity<CollectionModel<PurchaseOption>> getOptions(HttpServletRequest request) {
+        authService.validateRequest(request);
+        List<PurchaseOption> purchaseOptions = purchaseService.getOptions();
+
+        return ResponseEntity
+                .ok(CollectionModel.of(purchaseOptions));
+    }
+
+    @PostMapping("/{optionId}")
+    public ResponseEntity<Purchase> createPurchase(HttpServletRequest request, @PathVariable Long optionId) {
+        Session session = authService.validateRequest(request);
+        Purchase purchase = purchaseService.createPurchase(session.getUserId(), optionId);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(purchase);
+    }
 }

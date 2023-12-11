@@ -30,10 +30,26 @@ public class RecyclingCenterController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<CollectionModel<RecyclingCenter>> getAll(HttpServletRequest request) {
+    // /materials={}&search=%s&order=%s&reverse=%b&open=%b&latlng={}
+    public ResponseEntity<CollectionModel<RecyclingCenter>> getAll(
+            HttpServletRequest request,
+            @RequestParam(required = false) List<String> materials,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) Boolean reverse,
+            @RequestParam(required = false) Boolean open,
+            @RequestParam(required = false) List<Double> latlng,
+            @RequestParam(required = false, defaultValue = "0") Integer page
+    ) {
         authService.validateRequest(request);
+        List<RecyclingCenter> recyclingCenters;
+        if (latlng != null) {
+            if (latlng.size() != 2)
+                throw new IllegalArgumentException("latlng must be an array of size 2");
 
-        List<RecyclingCenter> recyclingCenters = recyclingCenterService.getAll();
+            recyclingCenters = recyclingCenterService.getClosest(latlng.get(0), latlng.get(1));
+        } else
+            recyclingCenters = recyclingCenterService.getAll(materials, search, order, reverse, open, page);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

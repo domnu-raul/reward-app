@@ -29,7 +29,7 @@ public class ContributionService {
         return contributionDAO.save(contribution);
     }
 
-    public List<Contribution> getContributionByUserId(Long id) {
-        return contributionDAO.getContributionsByUserId(id);
+    public List<Contribution> getContributionByUserId(Long id, Integer page) {
+        return contributionDAO.getContributionsByUserId(id, page);
     }
 }

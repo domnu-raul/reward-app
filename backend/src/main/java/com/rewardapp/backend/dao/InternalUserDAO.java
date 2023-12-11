@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InternalUserDAO {
-    private static final RowMapper<InternalUser> rowMapper = RowMappers.internalUserMapper;
+    private static final RowMapper<InternalUser> rowMapper = RowMappers.INTERNAL_USER_ROW_MAPPER;
     private final JdbcTemplate jdbcTemplate;
 
 

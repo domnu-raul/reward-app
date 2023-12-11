@@ -18,7 +18,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class EmailTokenDAO {
-    private static final RowMapper<EmailToken> rowMapper = RowMappers.emailTokenMapper;
+    private static final RowMapper<EmailToken> rowMapper = RowMappers.EMAIL_TOKEN_ROW_MAPPER;
     private final JdbcTemplate jdbcTemplate;
 
     public Optional<EmailToken> findByToken(String token) {

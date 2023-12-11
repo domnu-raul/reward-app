@@ -14,10 +14,17 @@ public class ContributionDetailsProcessor implements RepresentationModelProcesso
 
     @Override
     public ContributionDetails process(ContributionDetails model) {
-        return model.add(
+        model.add(
                 linkTo(methodOn(ContributionController.class).get(model.getId(), null)).withSelfRel(),
-                linkTo(methodOn(RecyclingCenterController.class).get(model.getRecyclingCenter().getId(), null)).withRel("recycling_center"),
-                linkTo(methodOn(ContributionController.class).getAll(null)).withRel("all")
+                linkTo(methodOn(ContributionController.class).getAll(null, null)).withRel("all")
         );
+
+        if (model.getRecyclingCenter() != null) {
+            model.getRecyclingCenter().add(
+                    linkTo(methodOn(RecyclingCenterController.class).get(model.getRecyclingCenter().getId(), null)).withSelfRel()
+            );
+        }
+
+        return model;
     }
 }

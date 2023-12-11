@@ -1,6 +1,7 @@
 package com.rewardapp.backend.controllers;
 
 import com.rewardapp.backend.dao.UserDetailsDAO;
+import com.rewardapp.backend.models.Session;
 import com.rewardapp.backend.models.UserDetails;
 import com.rewardapp.backend.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/user-details")
 @RequiredArgsConstructor
-public class UserDataController {
+public class UserDetailsController {
     private final UserDetailsDAO userDetailsDAO;
     private final AuthService authService;
 
@@ -23,14 +24,14 @@ public class UserDataController {
         authService.validateAdminRequest(request);
 
         return ResponseEntity
-                .status(200)
-                .body(userDetailsDAO.getUserData(id));
+                .ok(userDetailsDAO.getUserDetails(id));
     }
 
     @GetMapping()
     public ResponseEntity<UserDetails> getUserData(HttpServletRequest request) {
+        Session session = authService.validateRequest(request);
+
         return ResponseEntity
-                .status(200)
-                .body(userDetailsDAO.getUserData(authService.validateRequest(request).getUserId()));
+                .ok(userDetailsDAO.getUserDetails(session.getUserId()));
     }
 }

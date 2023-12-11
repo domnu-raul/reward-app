@@ -13,6 +13,7 @@ public class Purchase extends RepresentationModel<Purchase> {
 
     private Long id;
     private Long userId;
+    private Long purchaseOptionId;
     private String timestamp;
     private Long cost;
 }

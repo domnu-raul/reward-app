@@ -1,0 +1,11 @@
+@NAME(select_recycling_centers)
+    SELECT *
+    FROM recycling_centers AS rc
+    LEFT JOIN public.recycling_centers_locations AS rcl
+    on rc.id = rcl.recycling_center_id LIMIT 20 OFFSET 0;
+
+@NAME(MaterialNames)
+    SELECT m.name FROM recycling_centers_materials rcm
+    JOIN public.materials m on m.id = rcm.material_id
+    WHERE  rcm.recycling_center_id = :rcid
+

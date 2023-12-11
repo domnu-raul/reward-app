@@ -1,6 +1,7 @@
 package com.rewardapp.backend.dao;
 
 import com.rewardapp.backend.models.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,16 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class UserDAO {
-    private static final RowMapper<User> rowMapper = RowMappers.userMapper;
+    private static final RowMapper<User> rowMapper = RowMappers.USER_ROW_MAPPER;
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final JdbcTemplate jdbcTemplate;
-
-    public UserDAO(NamedParameterJdbcTemplate namedParameterJdbcTemplate, JdbcTemplate jdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public List<User> list() {
         String sql = "SELECT * FROM users";

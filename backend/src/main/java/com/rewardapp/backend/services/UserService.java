@@ -2,9 +2,11 @@ package com.rewardapp.backend.services;
 
 import com.rewardapp.backend.dao.InternalUserDAO;
 import com.rewardapp.backend.dao.UserDAO;
+import com.rewardapp.backend.dao.UserDetailsDAO;
 import com.rewardapp.backend.entities.InternalUser;
 import com.rewardapp.backend.models.User;
 import com.rewardapp.backend.models.UserCredentials;
+import com.rewardapp.backend.models.UserDetails;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserDAO userDAO;
     private final InternalUserDAO internalUserDAO;
+    private final UserDetailsDAO userDetailsDAO;
 
     public User validate(UserCredentials credentials) {
         User user = userDAO.getUserByUsername(credentials.username());
@@ -61,5 +64,9 @@ public class UserService {
 
     public User getUserById(Long id) {
         return userDAO.getUserById(id);
+    }
+
+    public UserDetails getUserDetailsById(Long id) {
+        return userDetailsDAO.getUserDetails(id);
     }
 }

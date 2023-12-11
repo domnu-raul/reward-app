@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Component
 public class ContributionDAO {
-    private static final RowMapper<Contribution> rowMapper = RowMappers.contributionMapper;
+    private static final RowMapper<Contribution> rowMapper = RowMappers.CONTRIBUTION_ROW_MAPPER;
     private final JdbcTemplate jdbcTemplate;
 
     public ContributionDAO(JdbcTemplate jdbcTemplate) {
@@ -29,10 +29,10 @@ public class ContributionDAO {
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
-    public List<Contribution> getContributionsByUserId(Long userId) {
+    public List<Contribution> getContributionsByUserId(Long userId, Integer page) {
         String sql = "SELECT c.id, c.measurment, c.user_id, c.recycling_center_id, c.timestamp, c.quantity, c.reward, m.name " +
-                "FROM contributions c JOIN public.materials m on m.id = c.material_id WHERE c.user_id = ?";
-        return jdbcTemplate.query(sql, rowMapper, userId);
+                "FROM contributions c JOIN public.materials m on m.id = c.material_id WHERE c.user_id = ? ORDER BY c.timestamp DESC LIMIT 20 OFFSET ?";
+        return jdbcTemplate.query(sql, rowMapper, userId, page * 20);
     }
 
     public void validate(Contribution contribution) {

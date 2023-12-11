@@ -16,7 +16,7 @@ public class RecyclingCenterProcessor implements RepresentationModelProcessor<Re
         return model.add(
                 linkTo(methodOn(RecyclingCenterController.class).get(model.getId(), null))
                         .withSelfRel(),
-                linkTo(methodOn(RecyclingCenterController.class).getAll(null))
+                linkTo(methodOn(RecyclingCenterController.class).getAll(null, null, null, null, null, null, null, null))
                         .withRel("all")
         );
     }

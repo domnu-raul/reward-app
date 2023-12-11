@@ -16,7 +16,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class SessionDAO {
-    private static final RowMapper<Session> rowMapper = RowMappers.sessionMapper;
+    private static final RowMapper<Session> rowMapper = RowMappers.SESSION_ROW_MAPPER;
 
     private final JdbcTemplate jdbcTemplate;
 
