@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.text.StringSubstitutor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -32,35 +30,32 @@ public class RecyclingCenterDAO {
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
-    // todo: rename order to sort.
     public List<RecyclingCenter> getAll(List<String> materials, String search,
-            String order, Boolean reverse,
+            String sortColumn, Boolean reverse,
             Boolean open, Integer page) {
 
-        List<String> where = new ArrayList<>();
-        List<String> order_by = new ArrayList<>();
+        List<String> whereList = new ArrayList<>();
+        List<String> orderList = new ArrayList<>();
 
         if (open != null) {
-            where.add(new StringBuilder()
-                    .append(open == null ? "" : (open == true ? "" : "NOT "))
-                    .append("(CURRENT_TIME BETWEEN start_time AND end_time)")
-                    .toString()
+            whereList.add(
+                    new StringBuilder()
+                            .append(open == true ? "" : "NOT ")
+                            .append("(CURRENT_TIME BETWEEN start_time AND end_time)")
+                            .toString()
 
             );
         }
 
         if (materials != null && !materials.isEmpty()) {
-            where.add(
-                    new StringBuilder()
-                            .append("ARRAY[")
-                            .append(String.join(
-                                    ", ", materials.stream().map(x -> "'" + x + "'").toList()))
-                            .append("]::varchar[] <@ materials")
-                            .toString());
+            whereList.add(String.format(
+                    "ARRAY[%s]::varchar[] <@ materials",
+                    String.join(", ",
+                            materials.stream().map(x -> "'" + x + "'").toList())));
         }
 
         if (search != null && !search.isEmpty()) {
-            order_by.add(String.format(
+            orderList.add(String.format(
                     new StringBuilder()
                             .append("GREATEST(")
                             .append("SIMILARITY(METAPHONE(name, 10), METAPHONE('%s', 10)), ")
@@ -71,18 +66,18 @@ public class RecyclingCenterDAO {
                     search, search));
         }
 
-        if (order != null && !order.isEmpty()) {
-            order_by.add(order + (reverse ? " DESC" : " ASC"));
-        }
+        if (sortColumn != null && !sortColumn.isEmpty())
+            orderList.add(sortColumn +
+                    (reverse == null ? " ASC" : (reverse ? " DESC" : " ASC")));
 
-        String where_filter = where.isEmpty() ? "" : "WHERE " + String.join(" AND ", where);
-        String order_by_filter = order_by.isEmpty() ? "" : "ORDER BY " + String.join(", ", order_by);
+        String whereFilter = whereList.isEmpty() ? "" : "WHERE " + String.join(" AND ", whereList);
+        String orderFilter = orderList.isEmpty() ? "" : "ORDER BY " + String.join(", ", orderList);
 
         String sql = new StringBuilder()
                 .append("SELECT * FROM recycling_centers_view ")
-                .append(where_filter)
+                .append(whereFilter)
                 .append(" ")
-                .append(order_by_filter)
+                .append(orderFilter)
                 .append(" LIMIT 20 OFFSET ")
                 .append(page * 20)
                 .toString();
