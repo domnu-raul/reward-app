@@ -1,22 +1,18 @@
+Add GoogleUsers.
+Add Google Login.
+Make proper exception with ResponseStatusException(ALL CLASSES)
+Check everything works while working on the front-end.
+Encrypt session tokens.(Database)
+Clean up the code.
+Clean up the database.
+Response status for what is missing.
+
 DONE: Enforce measurments and material types into contributions.
 DONE: Add reward system(maybe a trigger) to contributions.
 DONE: SQL View to find the reward points of the user, the impact they had, and the money they earned.
 DONE: Add PurchaseOptions table.
 DONE: Add Vouchers table.
 DONE: Add Purchases table.
-Add GoogleUsers.
-
-implement:
-    DAO's for Purchases, Vouchers
-    DAO for a detailed user view(latest purchases, active vouchers, statistics)
-    Multiple search functions + pagination + search by nearest
-    // Google API coordinates.
-
-Mappers and DTO:
-    Contribution
-    Purchase
-    Session
-    User
 
 EXCEPTIONS:
     IncorrectPasswordException

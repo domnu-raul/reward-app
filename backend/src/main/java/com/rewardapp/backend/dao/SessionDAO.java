@@ -39,6 +39,11 @@ public class SessionDAO {
         jdbcTemplate.update(sql, sessionId);
     }
 
+    public void removeByUserExcept(Long userId, String sessionId) {
+        String sql = "DELETE FROM sessions WHERE user_id = ? AND session_id != ?";
+        jdbcTemplate.update(sql, userId, sessionId);
+    }
+
     public Integer removeExpiredSessions() {
         String sql = "DELETE FROM sessions WHERE expiration_date < now()";
         return (Integer) jdbcTemplate.update(sql);

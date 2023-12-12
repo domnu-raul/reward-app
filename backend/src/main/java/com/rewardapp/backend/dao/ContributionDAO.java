@@ -1,6 +1,7 @@
 package com.rewardapp.backend.dao;
 
 import com.rewardapp.backend.models.Contribution;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,13 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class ContributionDAO {
     private static final RowMapper<Contribution> rowMapper = RowMappers.CONTRIBUTION_ROW_MAPPER;
     private final JdbcTemplate jdbcTemplate;
-
-    public ContributionDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public Contribution getContributionById(Long id) {
         String sql = "SELECT c.id, c.measurment, c.user_id, c.recycling_center_id, c.timestamp, c.quantity, c.reward, m.name " +

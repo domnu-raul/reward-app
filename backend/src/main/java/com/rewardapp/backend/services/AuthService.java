@@ -20,7 +20,8 @@ public class AuthService {
     private final EmailSenderService emailSenderService;
     private final EmailTokenService emailTokenService;
 
-    public Session login(UserCredentials userCredentials, HttpServletResponse httpResponse) {
+    public Session login(UserCredentials userCredentials,
+                         HttpServletResponse httpResponse) {
         User user = userService.validate(userCredentials);
         Session session = sessionService.save(user);
 
@@ -41,26 +42,29 @@ public class AuthService {
         Session session = sessionService.validateRequest(request);
         User user = userService.getUserById(session.getUserId());
         if (user.getType() != User.UserType.ADMIN) {
-            throw new RuntimeException("You must be an admin to perform this action.");
+            throw new RuntimeException(
+                    "You must be an admin to perform this action.");
         }
         return session;
     }
 
     public User register(UserCredentials userCredentials) {
         User user = userService.register(userCredentials);
-//        emailSenderService.sendEmail(user.getEmail(), "Verify your email", "http://localhost:8080/api/auth/verify/" + emailTokenService.create(user.getId()).getToken());
+        // emailSenderService.sendEmail(user.getEmail(), "Verify your email",
+        // "http://localhost:8080/api/auth/verify/" +
+        // emailTokenService.create(user.getId()).getToken());
 
         return user;
     }
 
-    //todo: create a model for the oauth request body
+    // todo: create a model for the oauth request body
     public User registerOAuth(UserCredentials userCredentials) {
         return null;
     }
 
     public User verifyEmail(String token) {
-        EmailToken emailToken = emailTokenService.findEmailByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid token."));
+        EmailToken emailToken = emailTokenService.findEmailByToken(token).orElseThrow(
+                () -> new RuntimeException("Invalid token."));
 
         return userService.setVerified(emailToken.getUserId());
     }
@@ -69,24 +73,16 @@ public class AuthService {
         return userService.getUserById(session.getUserId());
     }
 
-    //todo: implement a status representation for the logout
+    // todo: implement a status representation for the logout
     public void logout(Session session) {
         sessionService.logout(session);
     }
 
-    public void logoutAll(User user) {
-//        sessionService.logoutAll(user);
+    public void logoutAll(Session session) {
+        sessionService.logoutAll(session);
     }
 
-    public User changePassword(User user, String newPassword) {
-        return null;
-    }
-
-    public User changeEmail(User user, String newEmail) {
-        return null;
-    }
-
-    public User changeUsername(User user, String newUsername) {
-        return null;
+    public User updateUser(Long userId, UserCredentials userCredentials) {
+        return userService.updateUser(userId, userCredentials);
     }
 }

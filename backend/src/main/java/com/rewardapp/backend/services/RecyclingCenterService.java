@@ -95,7 +95,7 @@ public class RecyclingCenterService {
         return recyclingCenterDAO.getAll(materials, search, order, reverse, open, page);
     }
 
-    public List<RecyclingCenter> getClosest(Double lat, Double lng) {
-        return recyclingCenterDAO.getClosest(lat, lng);
+    public List<RecyclingCenter> getClosest(Double lat, Double lng, Integer page) {
+        return recyclingCenterDAO.getClosest(lat, lng, page);
     }
 }

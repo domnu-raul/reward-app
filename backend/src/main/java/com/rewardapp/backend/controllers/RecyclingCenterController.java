@@ -21,35 +21,35 @@ public class RecyclingCenterController {
     private final AuthService authService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecyclingCenter> get(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+    public ResponseEntity<RecyclingCenter> get(@PathVariable(name = "id") Long id,
+                                               HttpServletRequest request) {
         authService.validateRequest(request);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(recyclingCenterService.findRecyclingCenterById(id));
     }
 
     @GetMapping("/all")
-    // /materials={}&search=%s&order=%s&reverse=%b&open=%b&latlng={}
-    public ResponseEntity<CollectionModel<RecyclingCenter>> getAll(
-            HttpServletRequest request,
-            @RequestParam(required = false) List<String> materials,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String order,
-            @RequestParam(required = false) Boolean reverse,
-            @RequestParam(required = false) Boolean open,
-            @RequestParam(required = false) List<Double> latlng,
-            @RequestParam(required = false, defaultValue = "0") Integer page
-    ) {
+    public ResponseEntity<CollectionModel<RecyclingCenter>> getAll(HttpServletRequest request,
+                                                                   @RequestParam(required = false) List<String> materials,
+                                                                   @RequestParam(required = false) String search,
+                                                                   @RequestParam(required = false) String order,
+                                                                   @RequestParam(required = false) Boolean reverse,
+                                                                   @RequestParam(required = false) Boolean open,
+                                                                   @RequestParam(required = false) List<Double> latlng,
+                                                                   @RequestParam(required = false, defaultValue = "0") Integer page) {
         authService.validateRequest(request);
+
         List<RecyclingCenter> recyclingCenters;
+
         if (latlng != null) {
             if (latlng.size() != 2)
                 throw new IllegalArgumentException("latlng must be an array of size 2");
 
-            recyclingCenters = recyclingCenterService.getClosest(latlng.get(0), latlng.get(1));
+            recyclingCenters = recyclingCenterService.getClosest(latlng.get(0), latlng.get(1), page);
         } else
-            recyclingCenters = recyclingCenterService.getAll(materials, search, order, reverse, open, page);
+            recyclingCenters = recyclingCenterService.getAll(materials, search, order,
+                    reverse, open, page);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -66,7 +66,9 @@ public class RecyclingCenterController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<RecyclingCenter> update(@PathVariable("id") Long id, @RequestBody RecyclingCenter recyclingCenter, HttpServletRequest request) {
+    public ResponseEntity<RecyclingCenter> update(@PathVariable("id") Long id,
+                                                  @RequestBody RecyclingCenter recyclingCenter,
+                                                  HttpServletRequest request) {
         authService.validateAdminRequest(request);
 
         return ResponseEntity

@@ -7,11 +7,10 @@ import com.rewardapp.backend.entities.InternalUser;
 import com.rewardapp.backend.models.User;
 import com.rewardapp.backend.models.UserCredentials;
 import com.rewardapp.backend.models.UserDetails;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +30,8 @@ public class UserService {
     }
 
     public User register(UserCredentials credentials) {
-        Pattern email_validation = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
+        Pattern email_validation = Pattern.compile(
+                "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 
         if (!email_validation.matcher(credentials.email()).matches())
             throw new RuntimeException("invalid e-mail address");
@@ -45,10 +45,7 @@ public class UserService {
 
         user = userDAO.save(user);
 
-        InternalUser internalUser = new InternalUser(
-                user.getId(),
-                hashed_password
-        );
+        InternalUser internalUser = new InternalUser(user.getId(), hashed_password);
 
         internalUserDAO.save(internalUser);
         return user;
@@ -68,5 +65,9 @@ public class UserService {
 
     public UserDetails getUserDetailsById(Long id) {
         return userDetailsDAO.getUserDetails(id);
+    }
+
+    public User updateUser(Long id, UserCredentials userCredentials) {
+        return userDAO.updateUser(id, userCredentials);
     }
 }

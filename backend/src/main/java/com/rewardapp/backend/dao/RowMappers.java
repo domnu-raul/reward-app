@@ -116,4 +116,15 @@ public class RowMappers {
             rs.getLong("c_reward")
     );
 
+    public static final RowMapper<Voucher> VOUCHER_ROW_MAPPER = (rs, rowNum) -> new Voucher(
+            rs.getLong("id"),
+            rs.getLong("user_id"),
+            rs.getLong("purchase_id"),
+            rs.getDate("expiration_date").toString(),
+            rs.getInt("value"),
+            rs.getString("currency"),
+            rs.getBoolean("used"),
+            rs.getBoolean("active")
+    );
+
 }
