@@ -16,6 +16,8 @@ public class UserProcessor implements RepresentationModelProcessor<User> {
         return model.add(
                 linkTo(methodOn(AuthController.class).logout(null))
                         .withRel("logout"),
+                linkTo(methodOn(AuthController.class).logoutAll(null))
+                        .withRel("logout_all"),
                 linkTo(methodOn(AuthController.class).login(null, null))
                         .withRel("login")
         );

@@ -6,7 +6,6 @@ import com.rewardapp.backend.models.Session;
 import com.rewardapp.backend.services.AuthService;
 import com.rewardapp.backend.services.PurchaseService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -28,9 +27,7 @@ public class PurchaseController {
     //todo: add 'options/post' endpoint
 
     @GetMapping("/all")
-    public ResponseEntity<CollectionModel<Purchase>> getAllPurchases(HttpServletRequest request, @PathParam("page") Integer page) {
-        page = page == null || page <= 0 ? 0 : page - 1;
-
+    public ResponseEntity<CollectionModel<Purchase>> getAllPurchases(HttpServletRequest request, @RequestParam(required = false, defaultValue = "0") Integer page) {
         Session session = authService.validateRequest(request);
         List<Purchase> purchases = purchaseService.getPurchasesByUserId(session.getUserId(), page);
 

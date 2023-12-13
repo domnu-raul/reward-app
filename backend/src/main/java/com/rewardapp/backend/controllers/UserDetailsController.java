@@ -20,7 +20,7 @@ public class UserDetailsController {
     private final AuthService authService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDetails> getUserDataById(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<UserDetails> getUserDetailsById(@PathVariable Long id, HttpServletRequest request) {
         authService.validateAdminRequest(request);
 
         return ResponseEntity
@@ -28,7 +28,7 @@ public class UserDetailsController {
     }
 
     @GetMapping()
-    public ResponseEntity<UserDetails> getUserData(HttpServletRequest request) {
+    public ResponseEntity<UserDetails> getUserDetails(HttpServletRequest request) {
         Session session = authService.validateRequest(request);
 
         return ResponseEntity
