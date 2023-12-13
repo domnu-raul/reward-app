@@ -1,25 +1,21 @@
 import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes
+} from 'react-router-dom'
+import About from '../About/About'
 
 
-function About() {
-  return <h2>About</h2>
-}
-
-function UsersPage() {
-  return <h2>Users</h2>
-}
 export default function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/about">
-          <About />
-        </Route>
-        <Route path="/users">
-          <UsersPage />
+        <Route path="about" element={<About />} />
+        <Route path="users">
+          <h2>users</h2>
         </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   )
 }
