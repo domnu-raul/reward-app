@@ -3,19 +3,18 @@ package com.rewardapp.backend.dao;
 import com.rewardapp.backend.entities.Material;
 import com.rewardapp.backend.models.Location;
 import com.rewardapp.backend.models.RecyclingCenter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -31,16 +30,15 @@ public class RecyclingCenterDAO {
     }
 
     public List<RecyclingCenter> getAll(List<String> materials, String search,
-                                        String sortColumn, Boolean reverse,
-                                        Boolean open, Integer page) {
+            String sortColumn, Boolean reverse,
+            Boolean open, Integer page) {
 
         List<String> whereList = new ArrayList<>();
         List<String> orderList = new ArrayList<>();
 
         if (open != null) {
-            whereList.add(
-                    (open == true ? "" : "NOT ") +
-                            "(CURRENT_TIME BETWEEN start_time AND end_time)"
+            whereList.add((open == true ? "" : "NOT ") +
+                    "(CURRENT_TIME BETWEEN start_time AND end_time)"
 
             );
         }
@@ -49,20 +47,16 @@ public class RecyclingCenterDAO {
             whereList.add(String.format(
                     "ARRAY[%s]::varchar[] <@ materials",
                     String.join(", ",
-                            materials.stream()
-                                    .map(x -> "'" + x + "'")
-                                    .toList()
-                    )
-            ));
+                            materials.stream().map(x -> "'" + x + "'").toList())));
         }
 
         if (search != null && !search.isEmpty()) {
             orderList.add(String.format(
-                    "GREATEST(" +
-                            "SIMILARITY(METAPHONE(name, 10), METAPHONE('%s', 10)), " +
-                            "SIMILARITY(METAPHONE(" +
-                            "CONCAT_WS(' ', county, city, address, zipcode), 10), " +
-                            "METAPHONE('%s', 10))) DESC",
+                    "GREATEST("
+                            + "SIMILARITY(METAPHONE(name, 10), METAPHONE('%s', 10)), "
+                            + "SIMILARITY(METAPHONE("
+                            + "CONCAT_WS(' ', county, city, address, zipcode), 10), "
+                            + "METAPHONE('%s', 10))) DESC",
                     search, search));
         }
 
@@ -73,12 +67,8 @@ public class RecyclingCenterDAO {
         String whereFilter = whereList.isEmpty() ? "" : "WHERE " + String.join(" AND ", whereList);
         String orderFilter = orderList.isEmpty() ? "" : "ORDER BY " + String.join(", ", orderList);
 
-        String sql = "SELECT * FROM recycling_centers_view " +
-                whereFilter +
-                " " +
-                orderFilter +
-                " LIMIT 20 OFFSET " +
-                page * 20;
+        String sql = "SELECT * FROM recycling_centers_view " + whereFilter + " " +
+                orderFilter + " LIMIT 20 OFFSET " + page * 20;
 
         return jdbcTemplate.query(sql, rowMapper);
     }
@@ -193,8 +183,9 @@ public class RecyclingCenterDAO {
         return jdbcTemplate.update(sql, id) == 1;
     }
 
-    public List<RecyclingCenter> getClosest(Double lat, Double lng, Integer page) {
-        String sql = "SELECT * FROM recycling_centers_view ORDER BY (abs(latitude - ?), abs(longitude - ?)) ASC LIMIT ?";
+    public List<RecyclingCenter> getClosest(Double lat, Double lng,
+            Integer page) {
+        String sql = "SELECT * FROM recycling_centers_view ORDER BY (abs(latitude - ?), abs(longitude - ?)) ASC LIMIT 20 OFFSET ?";
 
         return jdbcTemplate.query(sql, rowMapper, lat, lng, page * 20);
     }

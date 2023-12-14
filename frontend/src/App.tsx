@@ -7,10 +7,24 @@ function App() {
     password: "password",
   });
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
   const [materials, setMaterials] = useState<string[]>([]);
   const [recyclingCenters, setRecyclingCenters] = useState([]);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      });
+    }
+  }, []);
 
   useEffect(() => {
     fetch("http://localhost:8082/api/auth/login", {
@@ -35,16 +49,22 @@ function App() {
 
   useEffect(() => {
     if (loggedIn == true) {
-      fetch(
-        `http://localhost:8082/api/recycling-centers/all?search=${search}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      )
+      let url = `http://localhost:8082/api/recycling-centers/all`;
+      if (search.length != 0) {
+        url += `?search=${search}`;
+      } else if (location != null) {
+        url += `?latlng=${location.lat},${location.lng}`;
+      }
+
+      console.log(url);
+
+      fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      })
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
@@ -56,8 +76,7 @@ function App() {
     } else {
       setRecyclingCenters([]);
     }
-    console.log(loggedIn);
-  }, [search, loggedIn]);
+  }, [loggedIn, location, search]);
 
   useEffect(() => {
     fetch(
@@ -112,16 +131,16 @@ function App() {
               .catch((error) => {
                 console.error(error);
               });
-              setLoggedIn(false);
+            setLoggedIn(false);
           }}
         >
           Logout
         </button>
       </form>
-
       <input
         type="text"
         value={search}
+        placeholder="Search..."
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setSearch(e.target.value)
         }
@@ -129,44 +148,51 @@ function App() {
       <input
         type="text"
         value={materials}
+        placeholder="Filter materials..."
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setMaterials(
             e.target.value.split(",").map((material) => material.toUpperCase())
           )
         }
       />
-      <table>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Materials</th>
-            <th>Starting Time</th>
-            <th>End Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {recyclingCenters.map((recyclingCenter: any) => (
-            <tr key={recyclingCenter.id}>
-              <td>{recyclingCenter.id}</td>
-              <td>{recyclingCenter.name}</td>
-              <td>
-                {recyclingCenter.location.address +
-                  ", " +
-                  recyclingCenter.location.city +
-                  ", " +
-                  recyclingCenter.location.county +
-                  ", " +
-                  recyclingCenter.location.zipcode}
-              </td>
-              <td>{recyclingCenter.materials.join(", ")}</td>
-              <td>{recyclingCenter.start_time}</td>
-              <td>{recyclingCenter.end_time}</td>
+      {loggedIn ? (
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Materials</th>
+              <th>Starting Time</th>
+              <th>End Time</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {recyclingCenters.map((recyclingCenter: any) => (
+              <tr key={recyclingCenter.id}>
+                <td>{recyclingCenter.id}</td>
+                <td>{recyclingCenter.name}</td>
+                <td>
+                  {recyclingCenter.location.address +
+                    ", " +
+                    recyclingCenter.location.city +
+                    ", " +
+                    recyclingCenter.location.county +
+                    ", " +
+                    recyclingCenter.location.zipcode +
+                    ", " +
+                    recyclingCenter.location.latitude +
+                    ", " +
+                    recyclingCenter.location.longitude}
+                </td>
+                <td>{recyclingCenter.materials.join(", ")}</td>
+                <td>{recyclingCenter.start_time}</td>
+                <td>{recyclingCenter.end_time}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (<h1>Please login</h1>)}
     </div>
   );
 }
