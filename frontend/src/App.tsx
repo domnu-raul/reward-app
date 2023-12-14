@@ -1,35 +1,174 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [userKey, setUserKey] = useState({
+    username: "example",
+    password: "password",
+  });
+
+  const [search, setSearch] = useState("");
+  const [materials, setMaterials] = useState<string[]>([]);
+  const [recyclingCenters, setRecyclingCenters] = useState([]);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetch("http://localhost:8082/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userKey),
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .then(() => {
+        setLoggedIn(true);
+      });
+  }, [userKey]);
+
+  useEffect(() => {
+    if (loggedIn == true) {
+      fetch(
+        `http://localhost:8082/api/recycling-centers/all?search=${search}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setRecyclingCenters(data._embedded.recycling_center_list);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      setRecyclingCenters([]);
+    }
+    console.log(loggedIn);
+  }, [search, loggedIn]);
+
+  useEffect(() => {
+    fetch(
+      `http://localhost:8082/api/recycling-centers/all?materials=${materials}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setRecyclingCenters(data._embedded.recycling_center_list);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [materials]);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div>
+      <form
+        onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+          e.preventDefault();
+          setUserKey({
+            username: (e.target as HTMLFormElement).username.value,
+            password: (e.target as HTMLFormElement).password.value,
+          });
+        }}
+        method="post"
+      >
+        <input type="text" name="username" placeholder="Username" />
+        <input type="password" name="password" placeholder="Password" />
+        <button type="submit">Login</button>
+        <button
+          type="button"
+          onClick={() => {
+            fetch("http://localhost:8082/api/auth/logout", {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log(data);
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+              setLoggedIn(false);
+          }}
+        >
+          Logout
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      </form>
+
+      <input
+        type="text"
+        value={search}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setSearch(e.target.value)
+        }
+      />
+      <input
+        type="text"
+        value={materials}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setMaterials(
+            e.target.value.split(",").map((material) => material.toUpperCase())
+          )
+        }
+      />
+      <table>
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Materials</th>
+            <th>Starting Time</th>
+            <th>End Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {recyclingCenters.map((recyclingCenter: any) => (
+            <tr key={recyclingCenter.id}>
+              <td>{recyclingCenter.id}</td>
+              <td>{recyclingCenter.name}</td>
+              <td>
+                {recyclingCenter.location.address +
+                  ", " +
+                  recyclingCenter.location.city +
+                  ", " +
+                  recyclingCenter.location.county +
+                  ", " +
+                  recyclingCenter.location.zipcode}
+              </td>
+              <td>{recyclingCenter.materials.join(", ")}</td>
+              <td>{recyclingCenter.start_time}</td>
+              <td>{recyclingCenter.end_time}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-export default App
+export default App;
