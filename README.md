@@ -7,4 +7,4 @@ The application serves as a method for promoting and rewarding recycling. A list
 The user may submit a contribution(recycling) containing the material type, recycling center, and the quantity along with the measurment used(depends on the material). The user gets reward points for contributions, which they can spend on vouchers.
 
 # Current State
-The backend provides an API that the client can use to provide functionalities listed above.
+The backend provides an API that the client can use to provide the functionalities listed above.
